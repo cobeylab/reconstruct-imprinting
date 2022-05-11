@@ -41,6 +41,8 @@ Imprinting probabilities are specific to the country and year of observation:
 
 [x] Finish downloading data for all WHO regions
 
+[] Check country and region names
+
 [] Unit tests
 
 [] System tests
