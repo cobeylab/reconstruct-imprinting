@@ -23,6 +23,8 @@ Imprinting probabilities are specific to the country and year of observation:
 
 # Workflow
 
+All code runs in the /R/ directory.
+
 * `get_imprinting_probabilities()` is the main function. It inputs a vector of observation years, a vector of country names, and the maximum year it outputs a matrix of birth year-specific imprinting probabilities for each country and observation year.  `script_calculate_imprinting_probs.R` is a script that shows example calls to `get_imprinting_probabilities()`
 
 # Code
