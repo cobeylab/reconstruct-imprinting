@@ -48,3 +48,5 @@ Imprinting probabilities are specific to the country and year of observation:
 [] Plan for systematic data updates (can we automate this?)
 
 [] Plan output filestructure and format
+
+[] Update Intensities in data and readme.
