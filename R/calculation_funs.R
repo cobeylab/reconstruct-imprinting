@@ -35,13 +35,13 @@ get_p_infection_year = function(birth_year,
 
 
 
-get_imprinting_probabilities <- function(max_year, ## Maximum year for which data is available (e.g. the current year)
-                                         observation_years,  ## Year of data collection, which matters if observation_year is shortly after birth_year
+get_imprinting_probabilities <- function(observation_years,  ## Year of data collection, which matters if observation_year is shortly after birth_year
                                          countries ## vector of one or more country names. See available_countries() for help.
 ){
   ## This is the master function
-  ## INPUT - a vector of countries, a vector of observation years, and the max_year for which data are available
+  ## INPUT - a vector of countries, a vector of observation years
   ## OUTPUT - a list of matrices containing subtype-specific imprinting probabilities for each country-year of observation, and each birth year
+  max_year = max(observation_years)
   birth_years = 1918:max_year
   infection_years = birth_years
   nn_birth_years = length(birth_years)
