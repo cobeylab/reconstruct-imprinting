@@ -42,6 +42,7 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   ## INPUT - a vector of countries, a vector of observation years
   ## OUTPUT - a list of matrices containing subtype-specific imprinting probabilities for each country-year of observation, and each birth year
   max_year = max(observation_years)
+  stopifnot(max_year <= as.numeric(format(Sys.Date(), '%Y')))
   birth_years = 1918:max_year
   infection_years = birth_years
   nn_birth_years = length(birth_years)
