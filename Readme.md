@@ -39,7 +39,7 @@ Imprinting probabilities are specific to the country and year of observation:
 
 [x] Update readme 
 
-[] Finish downloading data for all WHO regions
+[x] Finish downloading data for all WHO regions
 
 [] Unit tests
 
@@ -47,6 +47,6 @@ Imprinting probabilities are specific to the country and year of observation:
 
 [] Plan for systematic data updates (can we automate this?)
 
-[] Plan output filestructure and format
+[] Plan output filestructure and format.
 
 [] Update Intensities in data and readme.
