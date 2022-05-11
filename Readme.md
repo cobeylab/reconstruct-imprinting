@@ -13,8 +13,8 @@ Imprinting probabilities are specific to the country and year of observation:
 * From 1918-1976, only one influenza A subtype circulated at a time, and pandemic years mark the transitions between subtypes. We assume that H1N1 caused 100% of influenza A cases from 1918-1956, that H2N2 causes 100% of influenza A cases from 1957-1967, and that H3N2 caused 100% of influenza A cases from 1968-1976.
 * From 1977-present, A/H3N2 and A/H1N1 have both caused seasonal epidemics. The fraction of influenza cases caused by either subtype varies from year to year. Data avilability has improved over time:
 
-        * From **1977-1996**, data on the relative dominance of A/H1N1 and A/H3N2 are limited. We use United States-specific data from Table 1 of [Thompson et al. *JAMA*, 2003](https://jamanetwork.com/journals/jama/fullarticle/195750) to estimate the fraction of flu A cases caused by each subtype. These data are stored in ``.
-        * From **1997-present**, we use country or region-specific surveillance data from [WHO Flu Mart](https://apps.who.int/flumart/Default?ReportNo=12). We use country-specific data when more than 30 flu A specimens were reported in the year of interest, and region-specific data otherwise.
+  * From **1977-1996**, data on the relative dominance of A/H1N1 and A/H3N2 are limited. We use United States-specific data from Table 1 of [Thompson et al. *JAMA*, 2003](https://jamanetwork.com/journals/jama/fullarticle/195750) to estimate the fraction of flu A cases caused by each subtype. These data are stored in `processed-data/Thompson_data.csv`.
+  * From **1997-present**, we use country or region-specific surveillance data from [WHO Flu Mart](https://apps.who.int/flumart/Default?ReportNo=12). We use country-specific data when more than 30 flu A specimens were reported in the year of interest, and region-specific data otherwise.
         
 ### Relative intensity of influenza circulation over time
 
@@ -37,9 +37,14 @@ Imprinting probabilities are specific to the country and year of observation:
 
 # To do
 
-[x] Update readme
+[x] Update readme 
+
 [] Finish downloading data for all WHO regions
+
 [] Unit tests
+
 [] System tests
+
 [] Plan for systematic data updates (can we automate this?)
+
 [] Plan output filestructure and format
