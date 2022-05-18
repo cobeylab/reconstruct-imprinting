@@ -3,7 +3,7 @@ This repository contains files that can be used to reconstruct birth-year specif
 Imprinting probabilities are specific to the country and year of observation:
 
 * COUNTRY - For years 1997-present, we pull data from [WHO Flu Mart](https://apps.who.int/flumart/Default?ReportNo=12) to estimate the fraction of influenza A infections caused by subyptes H1N1 and H3N2. We use country-specific data whenever there are 30 or more influenza A samples available in the country and year of interest. If sample sizes are insufficient, we pull in data from the country's [WHO region](https://en.wikipedia.org/wiki/List_of_WHO_regions).
-*  YEAR OF OBSERVATION - We asume children <13 years of age may remain naive to influenza. The year of observation affects which birth years may not yet have imprinted to any subtype. In birth years >13 years of age, we normalize so that subtype-specific imprinting probabilities sum to one [(Gostic et al. 2016)](https://www.science.org/doi/10.1126/science.aag1322).
+*  YEAR OF OBSERVATION - We asume children <13 years of age can be naive to influenza. The year of observation affects which birth years can be naive. In birth years >13 years of age, we assume that everyone has been infected at least one, and normalize so that subtype-specific imprinting probabilities sum to one [(Gostic et al. 2016)](https://www.science.org/doi/10.1126/science.aag1322).
 
 
 # Data
@@ -23,6 +23,8 @@ Imprinting probabilities are specific to the country and year of observation:
 
 # Workflow
 
+All code runs in the /R/ directory.
+
 * `get_imprinting_probabilities()` is the main function. It inputs a vector of observation years, a vector of country names, and the maximum year it outputs a matrix of birth year-specific imprinting probabilities for each country and observation year.  `script_calculate_imprinting_probs.R` is a script that shows example calls to `get_imprinting_probabilities()`
 
 # Code
@@ -40,6 +42,8 @@ Imprinting probabilities are specific to the country and year of observation:
 [x] Update readme 
 
 [x] Finish downloading data for all WHO regions
+
+[] Check country and region names
 
 [] Unit tests
 
