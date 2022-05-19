@@ -17,10 +17,9 @@ show_available_countries <- function(){
 
 
 show_available_regions <- function(){
-  read_csv('../processed-data/who-regions.csv', show_col_types = F) %>%
-    select(`WHO region`) %>%
-    distinct() %>%
-    tolower()
+  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F) %>%
+    select(region) %>%
+    distinct() 
 }
 
 
