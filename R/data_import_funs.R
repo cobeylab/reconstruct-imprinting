@@ -10,27 +10,29 @@ check_years <- function(years, max_year){
   stopifnot(1997:max_year %in% years)
 }
 
+show_available_countries <- function(){
+  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F) %>%
+    select(country)
+}
 
-parse_country_names <- function(country){
-  ## Convert country names in who-regions.csv to country names in the Flunet data files
-  if(country == 'United States'){return('United States of America')}
-  if(country == 'Venezuela'){return('Venezuela (Bolivarian Republic of)')}
-  if(country == 'Bolivia'){return('Bolivia (Plurinational State of)')}
-  if(country == 'Turks and Caicos'){return('Turks and Caicos Is.')}
-  if(country == 'Iran'){return('Iran (Islamic Republic of)')}
-  if(country == 'Syria'){return('Syrian Arab Republic')}
-  if(country == 'Vietnam'){return('Viet Nam')}
-  if(country == 'South Korea'){return('Republic of Korea')}
-  if(country == 'United Kingdom'){return('United Kingdom of Great Britain and Northern Ireland')}
-  if(country == 'Kosovo'){return("Kosovo (in accordance with Security Council resolution 1244 (1999))")}
-  if(country == 'Russia'){return("Russian Federation")}
-  if(country == 'Moldova'){return("Republic of Moldova")}
-  ## else...
-  return(country)
+
+show_available_regions <- function(){
+  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F) %>%
+    select(region) %>%
+    distinct() 
+}
+
+
+parse_country_names <- function(this.country){
+  ## Convert short country names to country names in the Flunet data files
+  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F, col_types = 'cc') %>%
+    dplyr::filter(country == this.country) %>%
+    pull(flunet_country) %>%
+    return()
 }
 
 parse_region_names <- function(region){
-  ## Convert country names in who-regions.csv to country names in the Flunet data files
+  ## Convert two-word region names for file import
   if(tolower(region) == 'eastern mediterranean'){return('eastern_mediterranean')}
   if(tolower(region) == 'western pacific'){return('western_pacific')}
   if(tolower(region) == 'southeast asia'){return('southeast asia')}
@@ -38,15 +40,17 @@ parse_region_names <- function(region){
   return(region)
 }
 
-get_WHO_region <- function(country){
-  who_region = read_csv('../processed-data/who-regions.csv', show_col_types = FALSE) %>%
-    dplyr::filter(tolower(Entity) == tolower(country)) %>%
-    pull(`WHO region`) %>%
+get_WHO_region <- function(this.country){
+  who_region = read_csv('../processed-data/country_names_long_short.csv', show_col_types = FALSE) %>%
+    dplyr::filter(tolower(country) == tolower(this.country)) %>%
+    pull(region) %>%
     parse_region_names()
   ## If country not found, thorow an error and a help message
   if(length(who_region)<1){
     stop(sprintf('No country matching %s in database\n
                  see for a list of valid country names and WHO regions', country))
+  }else if(is.na(who_region)){
+    stop('who_region is NA. See ../processed-data/country_names_long_short.csv for raw reference.')
   }
   who_region
 }
@@ -66,7 +70,7 @@ get_template_data <- function(){
   ##  * group2: fraction of flu A positive specimens of group2 (H3N2)
   ## Load epidemiologica data from 1977-1996
   ## From Thompson et al. JAMA, 2003 (JAMA. 2003;289(2):179-186. doi:10.1001/jama.289.2.179)
-  Thompson_data = read_csv('../processed-data/Thompson_data.csv',, show_col_types = FALSE) %>%
+  Thompson_data = read_csv('../processed-data/Thompson_data.csv', show_col_types = FALSE) %>%
     mutate(`A/H1N1` = n_H1N1/n_A,
            `A/H2N2` = 0,
            `A/H3N2` = n_H3N2/n_A,
@@ -141,14 +145,13 @@ get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe',
 
 get_country_inputs_1997_to_present <- function(country, 
                                              max_year){ ## usually the current year 
-  who_region = get_WHO_region(country) %>%
-    parse_region_names()
+  who_region = get_WHO_region(country) 
   ## Get a list of the raw data files
-  file_list = list.files(sprintf('../raw-data/%s/', tolower(parse_region_names(who_region))))
+  file_list = list.files(sprintf('../raw-data/%s/', who_region))
   ## Throw an error and a help message if region doesn't exist
   if(length(file_list)<1){
     valid_regions = paste(list.files('../raw-data/'), collapse = ', ')
-    stop(sprintf('No files found for region:%s \nValid regions are: {%s}\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12', parse_region_names(who_region), valid_regions))
+    stop(sprintf('No files found for region:%s \nValid regions are: {%s}\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12',  who_region, valid_regions))
   }
   
   ## Load data from valid files
@@ -168,7 +171,7 @@ get_country_inputs_1997_to_present <- function(country,
     bind_rows() ## Combine into a single data frame
   cat(sprintf('country is %s', country))
   if(nrow(country_data) == 0){
-    stop(sprintf('No data in region %s for country %s', who_region, parse_country_names(country)))
+    stop(sprintf('No data in region %s for country %s\n See raw data files in ../raw-data/%s/ to check spelling.', who_region, country, who_region))
   }
   check_years(country_data$Year, max_year)
   return(country_data)
@@ -227,15 +230,4 @@ get_country_data <- function(country,
 }
 
 
-show_available_countries <- function(){
-  read_csv('../processed-data/who-regions.csv', show_col_types = F) %>%
-    rename(Country = Entity) %>%
-    select(Country, `WHO region`)
-}
 
-
-show_available_regions <- function(){
-  read_csv('../processed-data/who-regions.csv', show_col_types = F) %>%
-    select(`WHO region`) %>%
-    distinct()
-}
