@@ -1,3 +1,6 @@
+# Read data from CSVs into COUNTRY_NAMES, THOMPSON_DATA, and REGION_DATA
+source('load_data.R')
+
 test_rowsums_subtype <- function(H1N1, H2N2, H3N2){
  stopifnot(all(H1N1+H3N2+H2N2 == 1 | is.na(H1N1+H3N2+H2N2)))
 }
@@ -11,13 +14,13 @@ check_years <- function(years, max_year){
 }
 
 show_available_countries <- function(){
-  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F) %>%
+  COUNTRY_NAMES %>%
     select(country)
 }
 
 
 show_available_regions <- function(){
-  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F) %>%
+  COUNTRY_NAMES %>%
     select(region) %>%
     distinct() 
 }
@@ -25,23 +28,15 @@ show_available_regions <- function(){
 
 parse_country_names <- function(this.country){
   ## Convert short country names to country names in the Flunet data files
-  read_csv('../processed-data/country_names_long_short.csv', show_col_types = F, col_types = 'cc') %>%
+  COUNTRY_NAMES %>%
     dplyr::filter(country == this.country) %>%
     pull(flunet_country) %>%
     return()
 }
 
-parse_region_names <- function(region){
-  ## Convert two-word region names for file import
-  if(tolower(region) == 'eastern mediterranean'){return('eastern_mediterranean')}
-  if(tolower(region) == 'western pacific'){return('western_pacific')}
-  if(tolower(region) == 'southeast asia'){return('southeast asia')}
-  ## else...
-  return(region)
-}
 
 get_WHO_region <- function(this.country){
-  who_region = read_csv('../processed-data/country_names_long_short.csv', show_col_types = FALSE) %>%
+  who_region = COUNTRY_NAMES %>%
     dplyr::filter(tolower(country) == tolower(this.country)) %>%
     pull(region) %>%
     parse_region_names()
@@ -70,7 +65,7 @@ get_template_data <- function(){
   ##  * group2: fraction of flu A positive specimens of group2 (H3N2)
   ## Load epidemiologica data from 1977-1996
   ## From Thompson et al. JAMA, 2003 (JAMA. 2003;289(2):179-186. doi:10.1001/jama.289.2.179)
-  Thompson_data = read_csv('../processed-data/Thompson_data.csv', show_col_types = FALSE) %>%
+  Thompson_df = THOMPSON_DATA %>%
     mutate(`A/H1N1` = n_H1N1/n_A,
            `A/H2N2` = 0,
            `A/H3N2` = n_H3N2/n_A,
@@ -102,7 +97,7 @@ get_template_data <- function(){
            B = NA,
            data_from = 'Historical_assumption'),
     ## cocirculation 1977-1996
-    Thompson_data
+    Thompson_df
     ) %>%
     mutate(group1 = `A/H1N1` + `A/H2N2`,
            group2 = `A/H3N2`,
@@ -128,7 +123,7 @@ get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe',
   ## Load data from valid files
   region_data = lapply(file_list, function(this_file){ ## For each data file...
     this_filepath = sprintf('../raw-data/%s/%s', tolower(region), this_file)
-    read_csv(this_filepath, skip = 3, show_col_types = FALSE) %>% ## Read in the file
+    REGION_DATA[[this_filepath]] %>% ## Read in the file
       group_by(`WHOREGION`, Year) %>% ## Summarize the number of positive samples of each subtype observed in each year
       summarise(n_H1N1 = sum(AH1, na.rm = T)+sum(AH1N12009, na.rm = T),
                 n_H3N2 = sum(AH3, na.rm = T),
@@ -157,7 +152,7 @@ get_country_inputs_1997_to_present <- function(country,
   ## Load data from valid files
   country_data = lapply(file_list, function(this_file){ ## For each data file...
     this_filepath = sprintf('../raw-data/%s/%s', tolower(who_region), this_file)
-    read_csv(this_filepath, skip = 3, show_col_types = FALSE) %>% ## Read in the file
+    REGION_DATA[[this_filepath]] %>% ## Read in the file
       dplyr::filter(tolower(Country) == tolower(parse_country_names(country))) %>% ## Keep only the country of interest
       group_by(Country, Year) %>% ## Summarize the number of positive samples of each subtype observed in each year
       summarise(n_H1N1 = sum(AH1, na.rm = T)+sum(AH1N12009, na.rm = T),
@@ -169,7 +164,6 @@ get_country_inputs_1997_to_present <- function(country,
       ungroup()
   }) %>%
     bind_rows() ## Combine into a single data frame
-  cat(sprintf('country is %s', country))
   if(nrow(country_data) == 0){
     stop(sprintf('No data in region %s for country %s\n See raw data files in ../raw-data/%s/ to check spelling.', who_region, country, who_region))
   }
