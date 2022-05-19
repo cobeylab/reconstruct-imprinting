@@ -43,7 +43,7 @@ All code runs in the /R/ directory.
 
 [x] Finish downloading data for all WHO regions
 
-[] Check country and region names
+[x] Check country and region names
 
 [] Unit tests
 
@@ -54,3 +54,5 @@ All code runs in the /R/ directory.
 [] Plan output filestructure and format.
 
 [] Update Intensities in data and readme.
+
+[] Reformat outputs to a long data frame.
