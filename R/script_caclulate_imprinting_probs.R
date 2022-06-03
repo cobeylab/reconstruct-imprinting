@@ -1,3 +1,6 @@
+library(tidyverse)
+options(dplyr.summarise.inform = FALSE)
+
 ## Generate imprinting probabilities
 rm(list = ls())
 source('calculation_funs.R')
@@ -5,7 +8,6 @@ source('data_import_funs.R')
 
 ## NOTES:
 ## Currently, the maximum allowed observation_years value is 2017. I need to update the data to fix this.
-## I am not sure how to quiet all the weird tidyverse output to the console
 ## We may want to format these outputs as a long data frame instead of a list of matrices. The current format is a holdover from my previous work.
 
 ## Get probabilities for the United States in a single observation year

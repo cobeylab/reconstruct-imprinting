@@ -1,3 +1,5 @@
+cat('Reading annual intensities from ../processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
+INTENSITY_DATA = read_csv('../processed-data/Intensitymatser.csv', show_col_types = F)
 
 get_p_infection_year = function(birth_year,
                                 observation_year, ## Year of data collection, which matters if observation_year is shortly after birth_year
@@ -10,11 +12,9 @@ get_p_infection_year = function(birth_year,
   ## OUTPUTS
   ##    - vector of 13 probabilities, the first representing the probability of first flu infection in the first year of life (age 0), the second representing the probability of first flu infection in the second year of life (age 1), and so on up to the 13th year of life (age 12)
   stopifnot(observation_year <= max_year)
-  cat('Reading annual intensities from ../processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
-  intensity_df = read_csv('../processed-data/Intensitymatser.csv', show_col_types = F)
   # Weighted attack rate = annual prob infection weighted by circulation intensity
-  weighted.attack.rate = baseline_annual_p_infection*(intensity_df$intensity)
-  names(weighted.attack.rate) = intensity_df$year
+  weighted.attack.rate = baseline_annual_p_infection*(INTENSITY_DATA$intensity)
+  names(weighted.attack.rate) = INTENSITY_DATA$year
   ################# Calculations ---------------
   possible_imprinting_years = birth_year:min(birth_year+12, observation_year) #Calendar years of first infection (ages 0-12)
   nn = length(possible_imprinting_years) # How many possible years of first infection? (should be 13)
