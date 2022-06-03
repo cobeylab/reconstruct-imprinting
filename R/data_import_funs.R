@@ -234,15 +234,14 @@ get_country_cocirculation_data <- function(country,
 
 get_country_intensity_data <- function(country,
                                        max_year,
-                                       min_samples_processed_per_year = 30, ## If not enough observations available, default to regional data
-                                       intensity_master
+                                       min_samples_processed_per_year = 30 ## If not enough observations available, default to regional data
 ){
   ## Input - country name
   ## Output - Data frame containing:
   ##  * year: 1918:max_year
   ##  * intensity: [fraction of processed samples positive for flu A]/[mean fraction of processed samples positive for flu A]
   
-  pre_1997_intensity = intensity_master %>% dplyr::filter(year <= 1997)
+  pre_1997_intensity = INTENSITY_MASTER %>% dplyr::filter(year <= 1997)
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data = get_country_inputs_1997_to_present(country, max_year) %>%
     dplyr::filter(n_A >= min_samples_processed_per_year) %>%

@@ -64,7 +64,6 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   birth_years = 1918:max_year
   infection_years = birth_years
   nn_birth_years = length(birth_years)
-  intensity_master = read_csv('../processed-data/Intensitymatser.csv', show_col_types = F)
   
   #Initialize matrices to store imprinting probabilities for each country and year
   #Rows - which country and year are we doing the reconstruction from the persepctive of?
@@ -79,7 +78,7 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   for(this_country in countries){
     who_region = get_WHO_region(this_country)
     this_epi_data = get_country_cocirculation_data(this_country, max_year)
-    this_intensity_data = get_country_intensity_data(this_country, max_year, min_samples_processed_per_year = 50, intensity_master = intensity_master)
+    this_intensity_data = get_country_intensity_data(this_country, max_year, min_samples_processed_per_year = 50)
     
     #Extract and data from birth years of interest
     #These describe the fraction of circulating influenza viruses isolated in a given year that were of subtype H1N1 (type1), H2N2 (type2), or H3N2 (type3)
