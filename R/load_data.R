@@ -17,10 +17,9 @@ get_region_data <- function() {
     lapply(function(region) tolower(parse_region_names(region))) %>%
     lapply(function(region) list.files(sprintf('../raw-data/%s', region), full.names = TRUE)) %>%
     flatten()
-  dfs = lapply(paths, function(path) read_csv(path, skip = 3, show_col_types = FALSE))
+  dfs = lapply(paths, function(path) read_csv(path, skip = 3, col_types = 'ccciicciiiiiiiiiiiiiic'))
   names(dfs) <- paths
   dfs
 }
 
 REGION_DATA <- get_region_data()
-
