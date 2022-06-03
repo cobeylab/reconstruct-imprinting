@@ -2,7 +2,8 @@
 get_p_infection_year = function(birth_year,
                                 observation_year, ## Year of data collection, which matters if observation_year is shortly after birth_year
                                 baseline_annual_p_infection = 0.28, ## Baseline annual probability of infection
-                                max_year){ ## max calendar year for which to output estimates
+                                max_year,
+                                intensity_df){ ## max calendar year for which to output estimates
   ## Function to calculate probs of first exposure in year x, given birth in year y
   ## INPUTS
   ##    - year in which an individual was born (birth.year)
@@ -10,8 +11,6 @@ get_p_infection_year = function(birth_year,
   ## OUTPUTS
   ##    - vector of 13 probabilities, the first representing the probability of first flu infection in the first year of life (age 0), the second representing the probability of first flu infection in the second year of life (age 1), and so on up to the 13th year of life (age 12)
   stopifnot(observation_year <= max_year)
-  cat('Reading annual intensities from ../processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
-  intensity_df = read_csv('../processed-data/Intensitymatser.csv', show_col_types = F)
   # Weighted attack rate = annual prob infection weighted by circulation intensity
   weighted.attack.rate = baseline_annual_p_infection*(intensity_df$intensity)
   names(weighted.attack.rate) = intensity_df$year
@@ -34,6 +33,25 @@ get_p_infection_year = function(birth_year,
 }
 
 
+to_long_df <- function(outlist){
+  ## Reformat the list of matrix outputs into a long data frame
+  reformat_one_list_element <- function(ll){
+    ## ll is a matrix whose columns represent birth years, and rows represent unique countries and years of observation
+    mat_rownames = rownames(ll) ## Extract the country-year rownames
+    as.tibble(ll) %>% ## cast to tibble
+      mutate(year_country = mat_rownames) %>% ## Make the country-year rownames into a column
+      extract(year_country, into = c('year', 'country'), regex = '(\\d{4})(\\w.+)', convert = T) %>%
+      pivot_longer(-c(year, country), values_to = 'imprinting_prob', names_to = 'birth_year') %>%
+      mutate(birth_year = as.integer(birth_year))
+  }
+  ## Apply the reformatting function to all list elements
+  list_names = names(outlist)
+  subtypes = gsub('(.+)_probs', '\\1', list_names) ## extract the imprinted subtype from list names
+  list_of_dfs = lapply(outlist, reformat_one_list_element) ## reformat each matrix into a data frame
+  names(list_of_dfs) = subtypes ## Get the list of the subtype represented by each matrix in the list
+  bind_rows(list_of_dfs, .id = 'subtype') ## Bind all subtypes into a single long data frame and return
+}
+
 
 get_imprinting_probabilities <- function(observation_years,  ## Year of data collection, which matters if observation_year is shortly after birth_year
                                          countries ## vector of one or more country names. See available_countries() for help.
@@ -46,6 +64,7 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   birth_years = 1918:max_year
   infection_years = birth_years
   nn_birth_years = length(birth_years)
+  intensity_master = read_csv('../processed-data/Intensitymatser.csv', show_col_types = F)
   
   #Initialize matrices to store imprinting probabilities for each country and year
   #Rows - which country and year are we doing the reconstruction from the persepctive of?
@@ -59,7 +78,8 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   ## For each country, get imprinting probabilities
   for(this_country in countries){
     who_region = get_WHO_region(this_country)
-    this_epi_data = get_country_data(this_country, max_year)
+    this_epi_data = get_country_cocirculation_data(this_country, max_year)
+    this_intensity_data = get_country_intensity_data(this_country, max_year, min_samples_processed_per_year = 50, intensity_master = intensity_master)
     
     #Extract and data from birth years of interest
     #These describe the fraction of circulating influenza viruses isolated in a given year that were of subtype H1N1 (type1), H2N2 (type2), or H3N2 (type3)
@@ -82,7 +102,9 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
       for(ii in 1:n_valid_birth_years){ #for all birth years elapsed up to the observation year
         n_infection_years = min(12, observation_years[jj]-birth_years[ii]) # first infections can occur up to age 12, or up until the current year, whichever comes first
         inf.probs = get_p_infection_year(birth_years[ii], observation_years[jj], 
-                                         baseline_annual_p_infection = 0.28, max_year) # Get vector of year-specific probs of first infection
+                                         baseline_annual_p_infection = 0.28, 
+                                         max_year = max_year,
+                                         intensity_df = this_intensity_data) # Get vector of year-specific probs of first infection
         #If all 13 possible years of infection have passed, normalize so that the probability of imprinting from age 0-12 sums to 1
         if(length(inf.probs) == 13) inf.probs = inf.probs/sum(inf.probs)
         # Else, don't normalize and extract the probability of remaiing naive below.
@@ -124,10 +146,12 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   H3N2_probs = H3N2_probs/(total)
   naive_probs = naive_probs/(total)
   
-  return(list(H1N1_probs = H1N1_probs, 
+  outlist = list(H1N1_probs = H1N1_probs, 
               H2N2_probs=H2N2_probs, 
               H3N2_probs=H3N2_probs, 
-              naive_probs=naive_probs))
+              naive_probs=naive_probs)
+  
+  return(to_long_df(outlist))
 }
   
 
