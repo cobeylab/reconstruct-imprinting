@@ -130,7 +130,8 @@ get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe',
                 n_A = n_H1N1+n_H3N2,
                 n_BYam = sum(BYAMAGATA, na.rm = T),
                 n_BVic = sum(BVICTORIA, na.rm = T),
-                n_B = n_BYam+n_BVic) %>% ungroup()
+                n_B = n_BYam+n_BVic,
+                n_processed = sum(SPEC_PROCESSED_NB, na.rm = T)) %>% ungroup()
   }) %>%
     bind_rows() ## Combine into a single data frame
   check_years(region_data$Year, max_year)
@@ -160,7 +161,8 @@ get_country_inputs_1997_to_present <- function(country,
                 n_A = n_H1N1+n_H3N2,
                 n_BYam = sum(BYAMAGATA, na.rm = T),
                 n_BVic = sum(BVICTORIA, na.rm = T),
-                n_B = n_BYam+n_BVic) %>%
+                n_B = n_BYam+n_BVic,
+                n_processed = sum(SPEC_PROCESSED_NB, na.rm = T)) %>%
       ungroup()
   }) %>%
     bind_rows() ## Combine into a single data frame
@@ -172,9 +174,9 @@ get_country_inputs_1997_to_present <- function(country,
 }
 
 
-get_country_data <- function(country,
+get_country_cocirculation_data <- function(country,
                              max_year,
-                             min_samples_per_year = 30 ## If not enough observations available, default to regional data
+                             min_fluA_positive_samples_per_year = 30 ## If not enough observations available, default to regional data
                              ){
   ## Input - country name
   ## Output - Data frame containing:
@@ -189,7 +191,7 @@ get_country_data <- function(country,
   template = get_template_data()
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data = get_country_inputs_1997_to_present(country, max_year) %>%
-    dplyr::filter(n_A >= min_samples_per_year) %>%
+    dplyr::filter(n_A >= min_fluA_positive_samples_per_year) %>%
     mutate(data_from = paste0('country: ', country))
   ## Get regional data for years that don't meet the threshold
   region_data = get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
@@ -221,6 +223,45 @@ get_country_data <- function(country,
     t()
   colnames(output_matrix) = output_matrix['year',]
   return(output_matrix)    
+}
+
+
+get_country_intensity_data <- function(country,
+                                       max_year,
+                                       min_samples_processed_per_year = 30 ## If not enough observations available, default to regional data
+){
+  ## Input - country name
+  ## Output - Data frame containing:
+  ##  * year: 1918:max_year
+  ##  * intensity: [fraction of processed samples positive for flu A]/[mean fraction of processed samples positive for flu A]
+  
+  pre_1997_intensity = INTENSITY_MASTER %>% dplyr::filter(year <= 1997)
+  ## Get country data, and only keep years in which there are enough samples to meet the threshold
+  country_data = get_country_inputs_1997_to_present(country, max_year) %>%
+    dplyr::filter(n_A >= min_samples_processed_per_year) %>%
+    mutate(data_from = paste0('country: ', country))
+  ## Get regional data for years that don't meet the threshold
+  region_data = get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
+    dplyr::filter(!(Year %in% country_data$Year))
+  
+  ## Calculate the proportions of each subtype from counts,
+  ## And reformat to match the template columns
+  formatted_data = bind_rows(region_data,
+                             country_data) %>%
+    mutate(raw_intensity = n_A/n_processed,
+           intensity = raw_intensity/mean(raw_intensity, na.rm = T), ## Define intensity relative to the mean
+           intensity = pmin(intensity, 2.5)) %>% ## Max intensity is 2.5
+    rename(year = Year)%>%
+    select(year, intensity)
+
+  
+  ## Combine with the template data for pre-1977 years
+  full_outputs = bind_rows(pre_1997_intensity,
+                           formatted_data)
+  # ggplot(full_outputs) + geom_point(aes(x = year, y = intensity))
+  check_years(years = full_outputs$year, max_year = max_year)
+  ## Format as a matrix whose column names are years
+  return(full_outputs)    
 }
 
 
