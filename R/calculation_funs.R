@@ -138,7 +138,7 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
   
   ## Check that the total for each birth year is 1 when rounded to 4 decimals
   total = H1N1_probs+H2N2_probs+H3N2_probs+naive_probs
-  if(any(! (round(total, 4)%in%c(0,1)) )){warning('Weights do not sum to 1')}
+  if(any(! (round(total, 4)%in%c(0,1, NA)) )){warning('Weights do not sum to 1')}
   
   ## Normalize so that sum of weights is exactly 1 in each birth year
   total[which(total==0)] = 1 # Reset 0 values so as not to divide by 0

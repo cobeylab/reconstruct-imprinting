@@ -6,7 +6,7 @@ parse_region_names <- function(region){
   ## Convert two-word region names for file import
   if(tolower(region) == 'eastern mediterranean'){return('eastern_mediterranean')}
   if(tolower(region) == 'western pacific'){return('western_pacific')}
-  if(tolower(region) == 'southeast asia'){return('southeast asia')}
+  if(tolower(region) == 'southeast asia'){return('southeast_asia')}
   ## else...
   return(region)
 }

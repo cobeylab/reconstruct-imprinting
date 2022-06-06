@@ -10,7 +10,7 @@ get_imprinting_probabilities(observation_years = 2010,
                              countries = c('United States'))
 
 ## Get probabilities for the United States in a many observation years
-get_imprinting_probabilities(observation_years = 2010:2017, 
+get_imprinting_probabilities(observation_years = 2010:2022, 
                              countries = c('United States'))
 
 ## Get probabilities for the other countries in one observation year
@@ -40,4 +40,7 @@ get_imprinting_probabilities(observation_years = 2015,
 ## Get probabilities for many countries in several observation year
 get_imprinting_probabilities(observation_years = 2015:2017, 
                              countries = c('Argentina', 'United Kingdom', 'Canada', 'Israel'))
+
+get_imprinting_probabilities(observation_years = c(2007, 2010, 2022), 
+                             countries = c('Venezuela', 'Laos', 'Lithuania'))
 

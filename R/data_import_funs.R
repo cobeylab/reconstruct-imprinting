@@ -113,7 +113,7 @@ get_template_data <- function(){
 get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe', 'Asia' are current options
                                               max_year){ ## usually the current year 
    ## Get a list of the raw data files
-  file_list = list.files(sprintf('../raw-data/%s/', tolower(parse_region_names(region))))
+  file_list = list.files(sprintf('../raw-data/%s/', parse_region_names(region)))
    ## Throw an error and a help message if region doesn't exist
   if(length(file_list)<1){
     valid_regions = paste(list.files('../raw-data/'), collapse = ', ')
