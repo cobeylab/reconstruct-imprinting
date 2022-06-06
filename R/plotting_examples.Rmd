@@ -1,0 +1,49 @@
+---
+title: "Plotting examples"
+output: html_notebook
+---
+
+
+## Plotting examples for the imprinting calculator
+
+Examples for the functions in `plotting_funs.R`.
+
+Each function inputs a data frame of imprinting probabilities, output by `get_imprinting_probabilities()`.
+
+## Load packages and depencies
+```{r}
+source('plotting_funs.R')
+source('data_import_funs.R')
+source('calculation_funs.R')
+library(tidyverse)
+library(knitr)
+```
+
+
+## `plot_one_country_year` returns a bar plot for a single country-year
+```{r}
+plot_one_country_year(imprinting_df = get_imprinting_probabilities(2007, 'Brazil'))
+```
+
+
+## if more than one country year are calculated, the function returns the first unique country year in the output data frame 
+```{r fig.height=2.5, fig.width=5}
+plot_one_country_year(imprinting_df = get_imprinting_probabilities(2007:2010, c('Italy', 'Spain', 'Indonesia', 'Fiji', 'New Zealand')))
+```
+
+
+## plot_many_country_years returns:
+
+    * a bar plot showing imprinting probs for the first 5 countries in the data frame
+    * a line plot showing changes in imprinted ages over time for the first 5 countries
+
+```{r fig.height=9, fig.width=9}
+plot_many_country_years(imprinting_df =  get_imprinting_probabilities(c(2007:2010, 2022), c('Italy', 'Spain', 'Indonesia', 'Fiji', 'New Zealand', 'Ecuador')))
+```
+
+## If there is only one observation year, the arrow isn't plotted. 
+
+Should we just skip the right column in this case?
+```{r fig.height=9, fig.width=9}
+plot_many_country_years(imprinting_df =  get_imprinting_probabilities(2010, c('Italy', 'Spain', 'Indonesia', 'Fiji', 'New Zealand', 'Ecuador')))
+```
