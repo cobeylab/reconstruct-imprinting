@@ -32,6 +32,17 @@ All code runs in the /R/ directory.
 * `calculation_funs.R` contains functions used to calculate imprinting probabilities.
 * `data_import_funs.R` contains functions used to import country or region-specific data on the fraction of infections caused by difference influenza A subtypes over time.
 
+# Testing
+
+```
+
+Rscript tests.R
+
+```
+
+Or open tests.R and "Run Tests" from RStudio. Uses the [testthat](https://testthat.r-lib.org/) library.
+
+
 # Developer notes
 
 * `raw-data/` contains influenza surveillance data for each [WHO region](https://en.wikipedia.org/wiki/List_of_WHO_regions), downloaded from [WHO Flu Mart](https://apps.who.int/flumart/Default?ReportNo=12).
