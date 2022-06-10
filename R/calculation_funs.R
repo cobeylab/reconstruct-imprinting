@@ -58,9 +58,17 @@ to_long_df <- function(outlist){
 get_imprinting_probabilities <- function(observation_years,  ## Year of data collection, which matters if observation_year is shortly after birth_year
                                          countries ## vector of one or more country names. See available_countries() for help.
 ){
-  ## This is the master function
   ## INPUT - a vector of countries, a vector of observation years
   ## OUTPUT - a list of matrices containing subtype-specific imprinting probabilities for each country-year of observation, and each birth year
+  ## Input checks
+  current_year = as.numeric(format(Sys.Date(), '%Y'))
+  if(!all(observation_years>=1918 & observation_years<=current_year)){
+    stop('observation_years must be a numeric vector with values between 1918 and the current calendar year.')
+  }
+  if(!all(countries %in% pull(show_available_countries(), country))){
+    problem_inputs = countries[!(countries %in% pull(show_available_countries()))]
+    stop(sprintf('You input the following country names, which are invalid: \n\n%s\n\nRun `show_available_countries()` to see a list of valid countries.', paste(problem_inputs, collapse = ', ')))
+  }
   max_year = max(observation_years)
   stopifnot(max_year <= as.numeric(format(Sys.Date(), '%Y')))
   birth_years = 1918:max_year
