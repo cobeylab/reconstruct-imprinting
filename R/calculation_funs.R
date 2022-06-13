@@ -40,7 +40,7 @@ to_long_df <- function(outlist){
   reformat_one_list_element <- function(ll){
     ## ll is a matrix whose columns represent birth years, and rows represent unique countries and years of observation
     mat_rownames = rownames(ll) ## Extract the country-year rownames
-    as.tibble(ll) %>% ## cast to tibble
+    as_tibble(ll) %>% ## cast to tibble
       mutate(year_country = mat_rownames) %>% ## Make the country-year rownames into a column
       extract(year_country, into = c('year', 'country'), regex = '(\\d{4})(\\w.+)', convert = T) %>%
       pivot_longer(-c(year, country), values_to = 'imprinting_prob', names_to = 'birth_year') %>%
