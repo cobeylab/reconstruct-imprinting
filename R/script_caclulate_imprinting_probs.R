@@ -5,6 +5,7 @@ options(dplyr.summarise.inform = FALSE)
 source('calculation_funs.R')
 source('data_import_funs.R')
 
+
 ## Get probabilities for the United States in a single observation year
 get_imprinting_probabilities(observation_years = 2010, 
                              countries = c('United States'))
