@@ -14,8 +14,8 @@ get_p_infection_year = function(birth_year,
   ##    - vector of 13 probabilities, the first representing the probability of first flu infection in the first year of life (age 0), the second representing the probability of first flu infection in the second year of life (age 1), and so on up to the 13th year of life (age 12)
   stopifnot(observation_year <= max_year)
   # Weighted attack rate = annual prob infection weighted by circulation intensity
-  weighted.attack.rate = baseline_annual_p_infection*(INTENSITY_DATA$intensity)
-  names(weighted.attack.rate) = INTENSITY_DATA$year
+  weighted.attack.rate = baseline_annual_p_infection*(intensity_df$intensity)
+  names(weighted.attack.rate) = intensity_df$year
   ################# Calculations ---------------
   possible_imprinting_years = birth_year:min(birth_year+12, observation_year) #Calendar years of first infection (ages 0-12)
   nn = length(possible_imprinting_years) # How many possible years of first infection? (should be 13)
@@ -89,6 +89,7 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
     who_region = get_WHO_region(this_country)
     this_epi_data = get_country_cocirculation_data(this_country, max_year)
     this_intensity_data = get_country_intensity_data(this_country, max_year, min_samples_processed_per_year = 50)
+    stopifnot(!any(is.na(this_intensity_data$intensity)))
     
     #Extract and data from birth years of interest
     #These describe the fraction of circulating influenza viruses isolated in a given year that were of subtype H1N1 (type1), H2N2 (type2), or H3N2 (type3)

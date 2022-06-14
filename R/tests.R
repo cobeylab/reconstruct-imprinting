@@ -104,3 +104,18 @@ test_that("Range of years returned equals range of years passed.", {
 
 })
 
+
+
+test_that("Numeric (non-NA) probabilities are returned for post-2017 observation years.", {
+  library(tidyverse)
+  source('calculation_funs.R')
+  source('data_import_funs.R')
+  
+  obs_year = 2022
+  min_year = 1918
+  
+  probs = get_imprinting_probabilities(observation_years = obs_year, countries = c('United States'))
+  
+  expect_false(any(is.na(probs$imprinting_prob)))
+})
+
