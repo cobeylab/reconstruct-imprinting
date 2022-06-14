@@ -65,6 +65,8 @@ test_that("Misspelled country name gives an error.", {
 
   expect_error(get_country_cocirculation_data("United States?", 2010))
   expect_error(get_country_intensity_data("UnitedStates", 2010, min_samples_processed_per_year = 50))
+  expect_error(get_imprinting_probabilities(observation_years = obs_year, countries = c('UnitedStates')))
+
 })
 
 test_that("Invalid year gives an error.", {
@@ -76,3 +78,29 @@ test_that("Invalid year gives an error.", {
   expect_error(get_country_intensity_data("United States", 1900, min_samples_processed_per_year = 50))
 
 })
+
+test_that("Observation years greater than current year raises error.", {
+  library(tidyverse)
+  source('calculation_funs.R')
+  source('data_import_funs.R')
+
+  obs_year = as.numeric(format(Sys.Date(), '%Y')) + 1
+  expect_error(get_imprinting_probabilities(observation_years = obs_year, countries = c('United States')))
+
+})
+
+test_that("Range of years returned equals range of years passed.", {
+  library(tidyverse)
+  source('calculation_funs.R')
+  source('data_import_funs.R')
+
+  obs_year = 2018
+  min_year = 1918
+
+  probs = get_imprinting_probabilities(observation_years = obs_year, countries = c('United States'))
+
+  expect_equal(max(probs$birth_year), obs_year)
+  expect_equal(min(probs$birth_year), min_year)
+
+})
+
