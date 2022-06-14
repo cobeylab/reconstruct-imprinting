@@ -1,5 +1,5 @@
-cat('Reading annual intensities from ../processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
-INTENSITY_DATA = read_csv('../processed-data/Intensitymatser.csv', show_col_types = F)
+cat('Reading annual intensities from processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
+INTENSITY_DATA = read_csv('processed-data/Intensitymatser.csv', show_col_types = F)
 
 get_p_infection_year = function(birth_year,
                                 observation_year, ## Year of data collection, which matters if observation_year is shortly after birth_year

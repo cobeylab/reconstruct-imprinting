@@ -2,8 +2,8 @@
 rm(list = ls())
 library(tidyverse)
 options(dplyr.summarise.inform = FALSE)
-source('calculation_funs.R')
-source('data_import_funs.R')
+source('R/calculation_funs.R')
+source('R/data_import_funs.R')
 
 
 ## Get probabilities for the United States in a single observation year

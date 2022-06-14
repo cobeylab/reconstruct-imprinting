@@ -34,13 +34,10 @@ All code runs in the /R/ directory.
 
 # Testing
 
-```
 
-Rscript tests.R
+Run `devtools::test()` from R or RStudio, or Build --> "Test Package" from RStudio.
 
-```
-
-Or open tests.R and "Run Tests" from RStudio. Uses the [testthat](https://testthat.r-lib.org/) library.
+Uses the [testthat](https://testthat.r-lib.org/) library.
 
 
 # Developer notes

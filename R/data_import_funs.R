@@ -1,5 +1,5 @@
 # Read data from CSVs into COUNTRY_NAMES, THOMPSON_DATA, and REGION_DATA
-source('load_data.R')
+source('R/load_data.R')
 
 test_rowsums_subtype <- function(H1N1, H2N2, H3N2){
  stopifnot(all(H1N1+H3N2+H2N2 == 1 | is.na(H1N1+H3N2+H2N2)))
@@ -45,7 +45,7 @@ get_WHO_region <- function(this.country){
     stop(sprintf('No country matching %s in database\n
                  see for a list of valid country names and WHO regions', country))
   }else if(is.na(who_region)){
-    stop('who_region is NA. See ../processed-data/country_names_long_short.csv for raw reference.')
+    stop('who_region is NA. See processed-data/country_names_long_short.csv for raw reference.')
   }
   who_region
 }
@@ -113,16 +113,16 @@ get_template_data <- function(){
 get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe', 'Asia' are current options
                                               max_year){ ## usually the current year 
    ## Get a list of the raw data files
-  file_list = list.files(sprintf('../raw-data/%s/', parse_region_names(region)))
+  file_list = list.files(sprintf('raw-data/%s/', parse_region_names(region)))
    ## Throw an error and a help message if region doesn't exist
   if(length(file_list)<1){
-    valid_regions = paste(list.files('../raw-data/'), collapse = ', ')
+    valid_regions = paste(list.files('raw-data/'), collapse = ', ')
     stop(sprintf('No files found for region:%s \nValid regions are: {%s}\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12', parse_region_names(region), valid_regions))
   }
   
   ## Load data from valid files
   region_data = lapply(file_list, function(this_file){ ## For each data file...
-    this_filepath = sprintf('../raw-data/%s/%s', tolower(region), this_file)
+    this_filepath = sprintf('raw-data/%s/%s', tolower(region), this_file)
     REGION_DATA[[this_filepath]] %>% ## Read in the file
       group_by(`WHOREGION`, Year) %>% ## Summarize the number of positive samples of each subtype observed in each year
       summarise(n_H1N1 = sum(AH1, na.rm = T)+sum(AH1N12009, na.rm = T),
@@ -143,16 +143,16 @@ get_country_inputs_1997_to_present <- function(country,
                                              max_year){ ## usually the current year 
   who_region = get_WHO_region(country) 
   ## Get a list of the raw data files
-  file_list = list.files(sprintf('../raw-data/%s/', who_region))
+  file_list = list.files(sprintf('raw-data/%s/', who_region))
   ## Throw an error and a help message if region doesn't exist
   if(length(file_list)<1){
-    valid_regions = paste(list.files('../raw-data/'), collapse = ', ')
+    valid_regions = paste(list.files('raw-data/'), collapse = ', ')
     stop(sprintf('No files found for region:%s \nValid regions are: {%s}\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12',  who_region, valid_regions))
   }
   
   ## Load data from valid files
   country_data = lapply(file_list, function(this_file){ ## For each data file...
-    this_filepath = sprintf('../raw-data/%s/%s', tolower(who_region), this_file)
+    this_filepath = sprintf('raw-data/%s/%s', tolower(who_region), this_file)
     REGION_DATA[[this_filepath]] %>% ## Read in the file
       dplyr::filter(tolower(Country) == tolower(parse_country_names(country))) %>% ## Keep only the country of interest
       group_by(Country, Year) %>% ## Summarize the number of positive samples of each subtype observed in each year
@@ -167,7 +167,7 @@ get_country_inputs_1997_to_present <- function(country,
   }) %>%
     bind_rows() ## Combine into a single data frame
   if(nrow(country_data) == 0){
-    stop(sprintf('No data in region %s for country %s\n See raw data files in ../raw-data/%s/ to check spelling.', who_region, country, who_region))
+    stop(sprintf('No data in region %s for country %s\n See raw data files in raw-data/%s/ to check spelling.', who_region, country, who_region))
   }
   check_years(country_data$Year, max_year)
   return(country_data)

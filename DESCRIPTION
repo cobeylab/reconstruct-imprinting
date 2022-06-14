@@ -1,0 +1,15 @@
+Package: reconstructimprinting
+Type: Package
+Title: Imprinting Calculator
+Version: 0.1.0
+Author: Katelyn M. Gostic
+Maintainer: Katelyn M. Gostic <kgostic@uchicago.edu>
+Description: Reconstruct birth-year specific probabilities of imprinting to influenza A, but subtype or by group.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Depends:
+    tidyverse (>= 1.2.0)
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
