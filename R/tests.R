@@ -119,3 +119,21 @@ test_that("Numeric (non-NA) probabilities are returned for post-2017 observation
   expect_false(any(is.na(probs$imprinting_prob)))
 })
 
+test_that("Countries with low-quality intensity data return appropriate intensity values.", {
+
+library(tidyverse)
+source('calculation_funs.R')
+source('data_import_funs.R')
+
+intensities_Germany = get_country_intensity_data(country = c('Germany'), 
+                                                 max_year = 2022, 
+                                                 min_samples_processed_per_year = 50)
+intensities_Iraq = get_country_intensity_data(country = c('Iraq'), 
+                                                 max_year = 2022, 
+                                                 min_samples_processed_per_year = 50)
+
+expect_false(any(is.na(intensities_Germany$intensity)))
+expect_false(any(is.na(intensities_Iraq$intensity)))
+expect_true(all(intensities_Germany$intensity >= -2.5 & intensities_Germany$intensity <= 2.5))
+expect_true(all(intensities_Iraq$intensity >= -2.5 & intensities_Iraq$intensity <= 2.5))
+})
