@@ -111,7 +111,8 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
       n_valid_birth_years = observation_years[jj]-1918+1
       for(ii in 1:n_valid_birth_years){ #for all birth years elapsed up to the observation year
         n_infection_years = min(12, observation_years[jj]-birth_years[ii]) # first infections can occur up to age 12, or up until the current year, whichever comes first
-        inf.probs = get_p_infection_year(birth_years[ii], observation_years[jj], 
+        inf.probs = get_p_infection_year(birth_year = birth_years[ii], 
+                                         observation_year = observation_years[jj], 
                                          baseline_annual_p_infection = 0.28, 
                                          max_year = max_year,
                                          intensity_df = this_intensity_data) # Get vector of year-specific probs of first infection
