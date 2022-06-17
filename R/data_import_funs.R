@@ -228,7 +228,7 @@ get_country_cocirculation_data <- function(country,
 
 get_country_intensity_data <- function(country,
                                        max_year,
-                                       min_samples_processed_per_year = 30 ## If not enough observations available, default to regional data
+                                       min_samples_processed_per_year = 50 ## If not enough observations available, default to regional data
 ){
   ## Input - country name
   ## Output - Data frame containing:
@@ -238,20 +238,30 @@ get_country_intensity_data <- function(country,
   pre_1997_intensity = INTENSITY_MASTER %>% dplyr::filter(year <= 1997)
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data = get_country_inputs_1997_to_present(country, max_year) %>%
-    dplyr::filter(n_A >= min_samples_processed_per_year) %>%
-    mutate(data_from = paste0('country: ', country))
-  ## Get regional data for years that don't meet the threshold
+    dplyr::filter(n_processed >= min_samples_processed_per_year) %>% ## Exclude country-years that don't meet the minimum sample size
+    mutate(quality_check = n_processed >= (n_A+n_B)) %>%
+    dplyr::filter(quality_check == TRUE) %>% ## Exclude county-years that don't meet the quality check
+    mutate(data_from = paste0('country: ', country))%>%
+    mutate(raw_intensity = n_A/n_processed,
+           intensity = ifelse(quality_check == FALSE, 1, raw_intensity/mean(raw_intensity[quality_check == TRUE])), ## Define intensity relative to the mean
+           intensity = pmin(intensity, 2.5)) 
+    
+  ## Get regional data for years that don't meet the quality check and sample size requirements
   region_data = get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
-    dplyr::filter(!(Year %in% country_data$Year))
+    dplyr::filter(!(Year %in% country_data$Year)) %>%
+    mutate(data_from = paste0('region: ', get_WHO_region(country)),
+           quality_check = n_processed >= (n_A+n_B)) %>%
+    mutate(raw_intensity = n_A/n_processed,
+           intensity = ifelse(quality_check == FALSE, 1, raw_intensity/mean(raw_intensity[quality_check == TRUE])), ## Define intensity relative to the mean
+           intensity = pmin(intensity, 2.5))
   
   ## Calculate the proportions of each subtype from counts,
   ## And reformat to match the template columns
   formatted_data = bind_rows(region_data,
                              country_data) %>%
-    mutate(raw_intensity = n_A/n_processed,
-           intensity = raw_intensity/mean(raw_intensity, na.rm = T), ## Define intensity relative to the mean
-           intensity = pmin(intensity, 2.5)) %>% ## Max intensity is 2.5
+
     rename(year = Year)%>%
+    arrange(year) %>%
     select(year, intensity)
 
   

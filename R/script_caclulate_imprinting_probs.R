@@ -4,6 +4,7 @@ library(tidyverse)
 options(dplyr.summarise.inform = FALSE)
 source('R/calculation_funs.R')
 source('R/data_import_funs.R')
+source('R/plotting_funs.R')
 
 
 ## Get probabilities for the United States in a single observation year
@@ -19,19 +20,28 @@ get_imprinting_probabilities(observation_years = 2015,
                              countries = c('Mexico'))
 
 get_imprinting_probabilities(observation_years = 2015, 
-                             countries = c('Germany'))
+                             countries = c('Germany'))%>%
+  plot_one_country_year()
+
 
 get_imprinting_probabilities(observation_years = 2015, 
-                             countries = c('Egypt'))
+                             countries = c('Egypt'))%>%
+  plot_one_country_year()
+
 
 get_imprinting_probabilities(observation_years = 2015, 
-                             countries = c('Kenya'))
+                             countries = c('Kenya'))%>%
+  plot_one_country_year()
+
 
 get_imprinting_probabilities(observation_years = 2015, 
-                             countries = c('Australia'))
+                             countries = c('Australia'))%>%
+  plot_one_country_year()
+
 
 get_imprinting_probabilities(observation_years = 2015, 
-                             countries = c('Cambodia'))
+                             countries = c('Cambodia')) %>%
+  plot_one_country_year()
 
 ## Get probabilities for the many countries in one observation year
 get_imprinting_probabilities(observation_years = 2015, 
@@ -42,7 +52,8 @@ get_imprinting_probabilities(observation_years = 2015:2017,
                              countries = c('Argentina', 'United Kingdom', 'Canada', 'Israel'))
 
 get_imprinting_probabilities(observation_years = c(2007, 2010, 2022), 
-                             countries = c('Venezuela', 'Laos', 'Lithuania'))
+                             countries = c('Venezuela', 'Laos', 'Lithuania')) %>%
+  plot_many_country_years()
 
 
 

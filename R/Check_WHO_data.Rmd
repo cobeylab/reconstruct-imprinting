@@ -1,0 +1,94 @@
+---
+title: "Check WHO data"
+output: pdf_document
+---
+
+For 1997:present, we calculate the raw circulation intensity as the fraction of influenza samples processed that are positive for influenza A. We use country-specific data reported in WHO Flu Net, except if there are <50 samples processed within-country, we substitute regional data for that year.
+
+$\text{raw intensity} = \frac{n_A}{n_{processed}}$
+
+$n_A$ and $n_{processed}$ data values are reported in the raw data on WHO flu net.
+
+We then calculate the relative intensity of influenza A ciruclation in each year $y$ as $\frac{\text{raw intensity}_y}{\text{mean}(\text{raw intensity}_y)}$. We use the relative intensity to scale the annual probability of primary infection, so that so that the probability of imprinting in a year with higher-than average influenza A circulation is slightly higher than baseline.
+
+
+**Problem**
+
+The total number of specimens processed (n_processed) should always be greater than or equal to the number of infelunza A positive specimens in a given country and year.
+
+However, code testing revealed that in some cases (e.g. Germany, 1997), reported $n_{processed}$ values are less than $n_A$, the number of flu-A positive specimens.
+
+The purpose of this notebook is to check how often the n_processed column violates quality checks, and to decide how to handle exceptions.
+
+**Testing plan**
+
+For each country and year, check that:
+
+$n_{processed} \geq n_A+n_B$
+
+```{r}
+library(tidyverse)
+source('load_data.R')
+source('data_import_funs.R')
+```
+
+```{r}
+check_one_country = function(country){
+  max_year=2022
+  min_samples_processed_per_year = 30 ## If not enough observations available, default to regional data
+  
+  get_country_inputs_1997_to_present(country, max_year) %>%
+    #dplyr::filter(n_processed >= min_samples_processed_per_year) %>%
+    mutate(data_from = paste0('country: ', country)) %>%
+    mutate(check = n_processed >= n_A+n_B) %>% ## Implement check
+    select(Country, Year, n_H1N1, n_H3N2, n_A, n_B, n_processed, check) %>%
+    dplyr::filter(check == FALSE) ## Retun rows that fail check
+}
+```
+
+```{r message=FALSE}
+## Appply the test to all countries
+all_failures = lapply(show_available_countries()$country, FUN = check_one_country) %>%
+  bind_rows()
+```
+
+## Overall, there are 165 failures
+```{r}
+all_failures
+```
+
+## We eliminate most of the failures if we require >= 30 samples processed per year
+```{r message=FALSE}
+all_failures %>%
+  filter(n_processed > 30)
+```
+
+## We eliminate most of the failures if we require >= 50 samples processed per year
+```{r message=FALSE}
+all_failures %>%
+  filter(n_processed > 50)
+```
+
+## Check if the problem persists at the regional level
+```{r}
+check_one_region = function(region){
+  max_year=2022
+  
+get_regional_inputs_1997_to_present(region, max_year) %>%
+    mutate(check = n_processed >= n_A+n_B) %>% ## Implement check
+    select(WHOREGION, Year, n_H1N1, n_H3N2, n_A, n_B, n_processed, check) %>%
+    dplyr::filter(check == FALSE) ## Retun rows that fail check
+}
+```
+
+## There are a few years in the eastern mediterranean region that lack sufficient sample numbers and fail quality checks
+```{r}
+lapply(show_available_regions()$region %>% parse_region_names(), check_one_region)
+```
+
+
+## Overall plan to implement quality checks in intensity calculation pipeline:
+
+1. If >50 samples processed, and passes quality check (n_processed >= (n_A + n_B)), use country-specific data
+2. If >50 samples processed, and passes quality check, substitute region-specific data
+3. Else, if regional and country-specific data don't meet quality standards, default to the null value of intensity = 1
