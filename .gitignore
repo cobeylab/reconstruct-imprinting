@@ -63,3 +63,6 @@ vignettes/*.pdf
 **/*.ppt
 **/*.xlsx
 **/*.xls
+
+## Vim
+*.swp
