@@ -1,4 +1,3 @@
-setwd("../..")
 
 test_that("Observation years greater than current year raises error.", {
 
