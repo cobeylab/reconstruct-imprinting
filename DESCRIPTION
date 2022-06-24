@@ -9,7 +9,13 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 Depends:
-    tidyverse (>= 1.2.0)
+    tidyverse (>= 1.2.0),
+    cowplot (>= 1.0.0),
+    R (>= 2.10)
 Suggests:
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+RoxygenNote: 7.2.0
+VignetteBuilder: knitr
