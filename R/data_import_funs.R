@@ -1,5 +1,16 @@
 # Read data from CSVs into COUNTRY_NAMES, THOMPSON_DATA, and REGION_DATA
-source('R/load_data.R')
+load('data/COUNTRY_NAMES.rda')
+load('data/THOMPSON_DATA.rda')
+load('data/INTENSITY_DATA.rda')
+
+parse_region_names <- function(region){
+  ## Convert two-word region names for file import
+  if(tolower(region) == 'eastern mediterranean'){return('eastern_mediterranean')}
+  if(tolower(region) == 'western pacific'){return('western_pacific')}
+  if(tolower(region) == 'southeast asia'){return('southeast_asia')}
+  ## else...
+  return(region)
+}
 
 test_rowsums_subtype <- function(H1N1, H2N2, H3N2){
  stopifnot(all(H1N1+H3N2+H2N2 == 1 | is.na(H1N1+H3N2+H2N2)))
@@ -112,67 +123,39 @@ get_template_data <- function(){
 
 get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe', 'Asia' are current options
                                               max_year){ ## usually the current year 
-   ## Get a list of the raw data files
-  file_list = list.files(sprintf('raw-data/%s/', parse_region_names(region)))
-   ## Throw an error and a help message if region doesn't exist
-  if(length(file_list)<1){
-    valid_regions = paste(list.files('raw-data/'), collapse = ', ')
-    stop(sprintf('No files found for region:%s \nValid regions are: {%s}\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12', parse_region_names(region), valid_regions))
+  load('data/valid_regions.rda')
+  ## Throw an error and a help message if region doesn't exist
+  if(!region %in% valid_regions){
+    stop(sprintf('No files found for region: %s \nValid regions are: %s\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12', parse_region_names(region), paste(valid_regions, sep=", ")))
   }
   
   ## Load data from valid files
-  region_data = lapply(file_list, function(this_file){ ## For each data file...
-    this_filepath = sprintf('raw-data/%s/%s', tolower(region), this_file)
-    REGION_DATA[[this_filepath]] %>% ## Read in the file
-      group_by(`WHOREGION`, Year) %>% ## Summarize the number of positive samples of each subtype observed in each year
-      summarise(n_H1N1 = sum(AH1, na.rm = T)+sum(AH1N12009, na.rm = T),
-                n_H3N2 = sum(AH3, na.rm = T),
-                n_A = n_H1N1+n_H3N2,
-                n_BYam = sum(BYAMAGATA, na.rm = T),
-                n_BVic = sum(BVICTORIA, na.rm = T),
-                n_B = n_BYam+n_BVic,
-                n_processed = sum(SPEC_PROCESSED_NB, na.rm = T)) %>% ungroup()
-  }) %>%
-    bind_rows() ## Combine into a single data frame
-  check_years(region_data$Year, max_year)
-  return(region_data)
+  load('data/region_data.rda')
+
+  current_region_data = region_data[[region]]
+  check_years(current_region_data$Year, max_year)
+  return(current_region_data)
 }
 
 
 get_country_inputs_1997_to_present <- function(country, 
                                              max_year){ ## usually the current year 
   who_region = get_WHO_region(country) 
-  ## Get a list of the raw data files
-  file_list = list.files(sprintf('raw-data/%s/', who_region))
   ## Throw an error and a help message if region doesn't exist
-  if(length(file_list)<1){
-    valid_regions = paste(list.files('raw-data/'), collapse = ', ')
-    stop(sprintf('No files found for region:%s \nValid regions are: {%s}\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12',  who_region, valid_regions))
+  load('data/valid_regions.rda')
+  if(!who_region %in% valid_regions){
+    stop(sprintf('No files found for region: "%s" \nValid regions are: %s\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12',  who_region, paste(valid_regions, sep=", ")))
   }
-  
-  ## Load data from valid files
-  country_data = lapply(file_list, function(this_file){ ## For each data file...
-    this_filepath = sprintf('raw-data/%s/%s', tolower(who_region), this_file)
-    REGION_DATA[[this_filepath]] %>% ## Read in the file
-      dplyr::filter(tolower(Country) == tolower(parse_country_names(country))) %>% ## Keep only the country of interest
-      group_by(Country, Year) %>% ## Summarize the number of positive samples of each subtype observed in each year
-      summarise(n_H1N1 = sum(AH1, na.rm = T)+sum(AH1N12009, na.rm = T),
-                n_H3N2 = sum(AH3, na.rm = T),
-                n_A = n_H1N1+n_H3N2,
-                n_BYam = sum(BYAMAGATA, na.rm = T),
-                n_BVic = sum(BVICTORIA, na.rm = T),
-                n_B = n_BYam+n_BVic,
-                n_processed = sum(SPEC_PROCESSED_NB, na.rm = T)) %>%
-      ungroup()
-  }) %>%
-    bind_rows() ## Combine into a single data frame
-  if(nrow(country_data) == 0){
+ 
+  load("data/country_data.rda")
+  current_country_data = country_data[[country]]
+
+  if(nrow(current_country_data) == 0){
     stop(sprintf('No data in region %s for country %s\n See raw data files in raw-data/%s/ to check spelling.', who_region, country, who_region))
   }
-  check_years(country_data$Year, max_year)
-  return(country_data)
+  check_years(current_country_data$Year, max_year)
+  return(current_country_data)
 }
-
 
 get_country_cocirculation_data <- function(country,
                              max_year,
@@ -235,7 +218,7 @@ get_country_intensity_data <- function(country,
   ##  * year: 1918:max_year
   ##  * intensity: [fraction of processed samples positive for flu A]/[mean fraction of processed samples positive for flu A]
   
-  pre_1997_intensity = INTENSITY_MASTER %>% dplyr::filter(year <= 1997)
+  pre_1997_intensity = INTENSITY_DATA %>% dplyr::filter(year <= 1997)
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data = get_country_inputs_1997_to_present(country, max_year) %>%
     dplyr::filter(n_processed >= min_samples_processed_per_year) %>% ## Exclude country-years that don't meet the minimum sample size

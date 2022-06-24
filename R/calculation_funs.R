@@ -1,5 +1,5 @@
 cat('Reading annual intensities from processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
-INTENSITY_DATA = read_csv('processed-data/Intensitymatser.csv', show_col_types = F)
+load("data/INTENSITY_DATA.rda")
 
 get_p_infection_year = function(birth_year,
                                 observation_year, ## Year of data collection, which matters if observation_year is shortly after birth_year
@@ -54,7 +54,7 @@ to_long_df <- function(outlist){
   bind_rows(list_of_dfs, .id = 'subtype') ## Bind all subtypes into a single long data frame and return
 }
 
-
+#' @export
 get_imprinting_probabilities <- function(observation_years,  ## Year of data collection, which matters if observation_year is shortly after birth_year
                                          countries ## vector of one or more country names. See available_countries() for help.
 ){
