@@ -1,6 +1,6 @@
-COUNTRY_NAMES = read_csv('processed-data/country_names_long_short.csv', show_col_types = FALSE)
-THOMPSON_DATA = read_csv('processed-data/Thompson_data.csv', show_col_types = FALSE)
-INTENSITY_MASTER = read_csv('processed-data/Intensitymatser.csv', show_col_types = FALSE)
+COUNTRY_NAMES = read_csv('data-raw/processed-data/country_names_long_short.csv', show_col_types = FALSE)
+THOMPSON_DATA = read_csv('data-raw/processed-data/Thompson_data.csv', show_col_types = FALSE)
+load('data/INTENSITY_DATA.rda')
 
 parse_region_names <- function(region){
   ## Convert two-word region names for file import

@@ -1,4 +1,3 @@
-setwd("../..")
 
 test_that("Observation year less than 13 years from birth year gives known-good probabilities.", {
 

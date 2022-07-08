@@ -1,5 +1,6 @@
 ## Functions to plot the outputs of `get_imprinting_probabilities`
 
+#' @export
 plot_one_country_year <- function(imprinting_df){
   ## This function plots imprinting patterns for a single country-year
   ## If the data frame contains more than one country-year, it plots the first listed
@@ -25,6 +26,7 @@ plot_one_country_year <- function(imprinting_df){
 }
 
 
+#' @export
 plot_many_country_years <- function(imprinting_df){
   ## This function plots imprinting patterns for a single country-year
   ## If the data frame contains more than one country-year, it plots the first listed
