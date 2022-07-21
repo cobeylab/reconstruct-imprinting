@@ -1,4 +1,4 @@
-load('data/COUNTRY_NAMES.rda')
-load('data/THOMPSON_DATA.rda')
-load('data/INTENSITY_DATA.rda')
-load('data/valid_regions.rda')
+COUNTRY_NAMES = readRDS('data/COUNTRY_NAMES.rds')
+THOMPSON_DATA = readRDS('data/THOMPSON_DATA.rds')
+INTENSITY_DATA = readRDS('data/INTENSITY_DATA.rds')
+valid_regions = readRDS('data/valid_regions.rds')

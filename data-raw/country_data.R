@@ -27,4 +27,4 @@ country_data = lapply(COUNTRY_NAMES$country, function(country) {
 
 names(country_data) <- COUNTRY_NAMES$country
 
-usethis::use_data(country_data, overwrite = TRUE)
+saveRDS(country_data, 'data/country_data.rds')

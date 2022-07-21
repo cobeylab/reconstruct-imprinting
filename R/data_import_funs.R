@@ -1,7 +1,7 @@
 # Read data from CSVs into COUNTRY_NAMES, THOMPSON_DATA, and REGION_DATA
-load('data/COUNTRY_NAMES.rda')
-load('data/THOMPSON_DATA.rda')
-load('data/INTENSITY_DATA.rda')
+COUNTRY_NAMES = readRDS('data/COUNTRY_NAMES.rds')
+THOMPSON_DATA = readRDS('data/THOMPSON_DATA.rds')
+INTENSITY_DATA = readRDS('data/INTENSITY_DATA.rds')
 
 parse_region_names <- function(region){
   ## Convert two-word region names for file import
@@ -123,14 +123,14 @@ get_template_data <- function(){
 
 get_regional_inputs_1997_to_present <- function(region, ## 'Americas', 'Europe', 'Asia' are current options
                                               max_year){ ## usually the current year 
-  load('data/valid_regions.rda')
+  valid_regions = readRDS('data/valid_regions.rds')
   ## Throw an error and a help message if region doesn't exist
   if(!region %in% valid_regions){
     stop(sprintf('No files found for region: %s \nValid regions are: %s\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12', parse_region_names(region), paste(valid_regions, sep=", ")))
   }
   
   ## Load data from valid files
-  load('data/region_data.rda')
+  region_data = readRDS('data/region_data.rds')
 
   current_region_data = region_data[[region]]
   check_years(current_region_data$Year, max_year)
@@ -142,12 +142,12 @@ get_country_inputs_1997_to_present <- function(country,
                                              max_year){ ## usually the current year 
   who_region = get_WHO_region(country) 
   ## Throw an error and a help message if region doesn't exist
-  load('data/valid_regions.rda')
+  valid_regions = readRDS('data/valid_regions.rds')
   if(!who_region %in% valid_regions){
     stop(sprintf('No files found for region: "%s" \nValid regions are: %s\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12',  who_region, paste(valid_regions, sep=", ")))
   }
  
-  load("data/country_data.rda")
+  country_data = readRDS("data/country_data.rds")
   current_country_data = country_data[[country]]
 
   if(nrow(current_country_data) == 0){

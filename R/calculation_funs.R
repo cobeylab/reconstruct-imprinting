@@ -1,5 +1,5 @@
 cat('Reading annual intensities from processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
-load("data/INTENSITY_DATA.rda")
+INTENSTITY_DATA = readRDS("data/INTENSITY_DATA.rds")
 
 get_p_infection_year = function(birth_year,
                                 observation_year, ## Year of data collection, which matters if observation_year is shortly after birth_year
