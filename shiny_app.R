@@ -6,9 +6,12 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel(
       title = "Plots",
-      mainPanel(width = 12,align = "center",
+      mainPanel(width = 12,align = "left",
+                selectInput("country","Select country",choices=show_available_countries(), selected = "United States"),
+                selectInput("year","Select year",choices=show_available_years()),
+                submitButton("Plot"),
                 tags$h3("Single Country-Year"),
-                div(style = "float:left;width:36%;",plotOutput("country_year_bar_plot"))
+                div(style = "float:left;width:50%;",plotOutput("country_year_bar_plot"))
       )
     ),
     tabPanel(
@@ -19,7 +22,10 @@ ui <- fluidPage(
     )))
 
 server <- function(input, output, session) {
-  output$country_year_bar_plot = renderPlot({plot_one_country_year(imprinting_df = get_imprinting_probabilities(2007, 'Brazil'))})
+  one_country_year = reactive({
+    plot_one_country_year(imprinting_df = get_imprinting_probabilities(as.numeric(input$year), input$country))
+  })
+  output$country_year_bar_plot = renderPlot({one_country_year()})
 }
 
 shinyApp(ui, server)
