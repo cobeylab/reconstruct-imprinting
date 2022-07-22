@@ -8,7 +8,7 @@ ui <- fluidPage(
       title = "Plots",
       mainPanel(width = 12,align = "left",
                 selectInput("country","Select country",choices=show_available_countries(), selected = "United States"),
-                selectInput("year","Select year",choices=show_available_years()),
+                selectInput("year","Select year",choices=rev(show_available_years())),
                 submitButton("Plot"),
                 tags$h3("Single Country-Year"),
                 div(style = "float:left;width:50%;",plotOutput("country_year_bar_plot"))
