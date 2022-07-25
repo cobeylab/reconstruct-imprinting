@@ -284,7 +284,6 @@ get_country_intensity_data <- function(country,
     pre_1997_intensity,
     formatted_data
   )
-  # ggplot(full_outputs) + geom_point(aes(x = year, y = intensity))
   check_years(years = full_outputs$year, max_year = max_year)
   ## Format as a matrix whose column names are years
   return(full_outputs)
