@@ -95,9 +95,9 @@ get_imprinting_probabilities <- function(observation_years, ## Year of data coll
     # Extract and data from birth years of interest
     # These describe the fraction of circulating influenza viruses isolated in a given year that were of subtype H1N1 (type1), H2N2 (type2), or H3N2 (type3)
     H1.frac <- as.numeric(this_epi_data["A/H1N1", as.character(birth_years)])
-    H2.frac = as.numeric(this_epi_data["A/H2N2", as.character(birth_years)])
+    H2.frac <- as.numeric(this_epi_data["A/H2N2", as.character(birth_years)])
     H3.frac <- as.numeric(this_epi_data["A/H3N2", as.character(birth_years)])
-    names(H1.frac) <- names(H2.frac) <- names(H3.frac) <- as.character(birth_years  )  
+    names(H1.frac) <- names(H2.frac) <- names(H3.frac) <- as.character(birth_years)
 
     ## Initialize master matrix with observation_years on rows and birth years on columns
     country_H1_mat <- matrix(0,
