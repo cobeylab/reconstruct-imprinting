@@ -35,4 +35,4 @@ region_data = lapply(regions, function(region) {
 
 names(region_data) <- regions
 
-usethis::use_data(region_data, overwrite = TRUE)
+saveRDS(region_data, 'data/region_data.rds')
