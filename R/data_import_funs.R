@@ -2,6 +2,8 @@
 COUNTRY_NAMES = readRDS('data/COUNTRY_NAMES.rds')
 THOMPSON_DATA = readRDS('data/THOMPSON_DATA.rds')
 INTENSITY_DATA = readRDS('data/INTENSITY_DATA.rds')
+MIN_YEAR = 1997
+MAX_YEAR = 2022
 
 parse_region_names <- function(region){
   ## Convert two-word region names for file import
@@ -21,7 +23,7 @@ test_rowsums_group <- function(group1, group2){
 }
 
 check_years <- function(years, max_year){
-  stopifnot(1997:max_year %in% years)
+  stopifnot(MIN_YEAR:max_year %in% years)
 }
 
 show_available_countries <- function(){
@@ -34,6 +36,10 @@ show_available_regions <- function(){
   COUNTRY_NAMES %>%
     select(region) %>%
     distinct() 
+}
+
+show_available_years <- function(){
+  MIN_YEAR:MAX_YEAR
 }
 
 
