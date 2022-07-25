@@ -5,9 +5,9 @@ test_that("Observation year less than 13 years from birth year gives known-good 
   INTENSITY_DATA = get_country_intensity_data("United States", 2010, min_specimens = 50)
 
   # Birth Year 2007
-  expect_equal(get_p_infection_year(2007, 2010, 0.28, 2010, INTENSITY_DATA), c(0.19899714, 0.18616278, 0.43038805, 0.03884563))
+  expect_equal(get_p_infection_year(2007, 2010, 0.28, 2010, INTENSITY_DATA), c(0.20244365, 0.18857213, 0.42628896, 0.03914203), tolerance = 0.000001)
   # Birth Year 2010
-  expect_equal(get_p_infection_year(2010, 2010, 0.28, 2010, INTENSITY_DATA), c(0.2106002), tolerance = 0.000001)
+  expect_equal(get_p_infection_year(2010, 2010, 0.28, 2010, INTENSITY_DATA), c(0.2142477), tolerance = 0.000001)
 
 })
 
@@ -17,10 +17,10 @@ test_that("Observation year greater than 13 years from birth year gives known-go
   INTENSITY_DATA = get_country_intensity_data("United States", 2010, min_specimens = 50)
 
   # Birth Year 1995
-  expect_equal(get_p_infection_year(1995, 2010, 0.28, 2010, INTENSITY_DATA), c(0.22467298, 0.24317721, 0.07694539, 0.02963517, 0.11150953, 0.05575555, 0.03564507, 0.04825983, 0.06960915, 0.01243207, 0.02032434, 0.01586563, 0.01117729), tolerance = 0.000001)
+  expect_equal(get_p_infection_year(1995, 2010, 0.28, 2010, INTENSITY_DATA), c(0.22467298, 0.24317721, 0.07694539, 0.03014844, 0.11330399, 0.05630441, 0.03586139, 0.04841809, 0.06950272, 0.01227025, 0.02001303, 0.01554628, 0.01089872), tolerance = 0.000001)
 
   # Birth Year 1998
-  expect_equal(get_p_infection_year(1998, 2010, 0.28, 2010, INTENSITY_DATA), c(0.065103001, 0.244965840, 0.122484638, 0.078305628, 0.106017928, 0.152918439, 0.027310965, 0.044648818, 0.034853868, 0.024554432, 0.022970789, 0.053105959, 0.004793197), tolerance = 0.000001)
+  expect_equal(get_p_infection_year(1998, 2010, 0.28, 2010, INTENSITY_DATA), c(0.066230545, 0.248907939, 0.123690388, 0.078780853, 0.106365603, 0.152684635, 0.026955481, 0.043964926, 0.034152297, 0.023942471, 0.022301922, 0.050416058, 0.004629224), tolerance = 0.000001)
 })
 
 test_that("Number of probabilities are same as number of years in input.", {
