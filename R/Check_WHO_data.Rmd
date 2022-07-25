@@ -28,19 +28,19 @@ $n_{processed} \geq n_A+n_B$
 
 ```{r}
 library(tidyverse)
-source('load_data.R')
-source('data_import_funs.R')
+source("load_data.R")
+source("data_import_funs.R")
 ```
 
 ```{r}
-check_one_country = function(country){
-  max_year=2022
-  min_samples_processed_per_year = 30 ## If not enough observations available, default to regional data
-  
+check_one_country <- function(country) {
+  max_year <- 2022
+  min_samples_processed_per_year <- 30 ## If not enough observations available, default to regional data
+
   get_country_inputs_1997_to_present(country, max_year) %>%
-    #dplyr::filter(n_processed >= min_samples_processed_per_year) %>%
-    mutate(data_from = paste0('country: ', country)) %>%
-    mutate(check = n_processed >= n_A+n_B) %>% ## Implement check
+    # dplyr::filter(n_processed >= min_samples_processed_per_year) %>%
+    mutate(data_from = paste0("country: ", country)) %>%
+    mutate(check = n_processed >= n_A + n_B) %>% ## Implement check
     select(Country, Year, n_H1N1, n_H3N2, n_A, n_B, n_processed, check) %>%
     dplyr::filter(check == FALSE) ## Retun rows that fail check
 }
@@ -48,7 +48,7 @@ check_one_country = function(country){
 
 ```{r message=FALSE}
 ## Appply the test to all countries
-all_failures = lapply(show_available_countries()$country, FUN = check_one_country) %>%
+all_failures <- lapply(show_available_countries()$country, FUN = check_one_country) %>%
   bind_rows()
 ```
 
@@ -71,11 +71,11 @@ all_failures %>%
 
 ## Check if the problem persists at the regional level
 ```{r}
-check_one_region = function(region){
-  max_year=2022
-  
-get_regional_inputs_1997_to_present(region, max_year) %>%
-    mutate(check = n_processed >= n_A+n_B) %>% ## Implement check
+check_one_region <- function(region) {
+  max_year <- 2022
+
+  get_regional_inputs_1997_to_present(region, max_year) %>%
+    mutate(check = n_processed >= n_A + n_B) %>% ## Implement check
     select(WHOREGION, Year, n_H1N1, n_H3N2, n_A, n_B, n_processed, check) %>%
     dplyr::filter(check == FALSE) ## Retun rows that fail check
 }
