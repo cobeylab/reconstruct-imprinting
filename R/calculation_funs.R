@@ -1,4 +1,3 @@
-cat('Reading annual intensities from processed_data/Intensitymaster.csv. See Gostic et al. 2016 for details.')
 INTENSITY_DATA = readRDS("data/INTENSITY_DATA.rds")
 
 get_p_infection_year = function(birth_year,
