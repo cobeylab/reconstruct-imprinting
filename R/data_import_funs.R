@@ -33,7 +33,14 @@ test_rowsums_group <- function(group1, group2){
 }
 
 check_years <- function(years, max_year){
+  check_max_year(max_year)
   stopifnot(1997:max_year %in% years)
+}
+
+check_max_year <- function(max_year){
+  if(!(max_year >= 1918 & max_year <= as.integer(format(Sys.Date(), '%Y')))){
+    stop(sprintf('max_year is %i. max_year must fall between 1918 and the current calendar year, %s.', max_year, as.integer(format(Sys.Date(), '%Y'))))
+  }
 }
 
 
@@ -185,6 +192,7 @@ get_template_data <- function(){
 #' @export
 get_regional_inputs_1997_to_present <- function(region,
                                               max_year){ 
+  check_max_year(max_year)
   valid_regions = readRDS('data/valid_regions.rds')
   ## Throw an error and a help message if region doesn't exist
   if(!region %in% valid_regions){
@@ -220,6 +228,7 @@ get_regional_inputs_1997_to_present <- function(region,
 #' @export
 get_country_inputs_1997_to_present <- function(country, 
                                              max_year){ ## usually the current year 
+  check_max_year(max_year)
   who_region = get_WHO_region(country) 
   ## Throw an error and a help message if region doesn't exist
   valid_regions = readRDS('data/valid_regions.rds')
@@ -272,6 +281,7 @@ get_country_cocirculation_data <- function(country,
                              max_year,
                              min_samples = 30 
                              ){
+  check_max_year(max_year)
   template = get_template_data()
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data = get_country_inputs_1997_to_present(country, max_year) %>%
@@ -330,7 +340,7 @@ get_country_intensity_data <- function(country,
                                        max_year,
                                        min_specimens = 50 ## If not enough observations available, default to regional data
 ){
-
+  check_max_year(max_year)
   pre_1997_intensity = INTENSITY_DATA %>% dplyr::filter(year <= 1997)
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data = get_country_inputs_1997_to_present(country, max_year) %>%
