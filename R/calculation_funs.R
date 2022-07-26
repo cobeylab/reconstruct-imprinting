@@ -46,6 +46,7 @@ get_p_infection_year <- function(birth_year,
   ## OUTPUTS
   ##    - vector of 13 probabilities, the first representing the probability of first flu infection in the first year of life (age 0), the second representing the probability of first flu infection in the second year of life (age 1), and so on up to the 13th year of life (age 12)
   stopifnot(observation_year <= max_year)
+  stopifnot(birth_year <= max_year)
   # Weighted attack rate = annual prob infection weighted by circulation intensity
   weighted.attack.rate <- baseline_annual_p_infection * (intensity_df$intensity)
   names(weighted.attack.rate) <- intensity_df$year
