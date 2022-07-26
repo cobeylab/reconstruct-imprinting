@@ -29,4 +29,4 @@ country_data <- lapply(COUNTRY_NAMES$country, function(country) {
 
 names(country_data) <- COUNTRY_NAMES$country
 
-saveRDS(country_data, "data/country_data.rds")
+saveRDS(country_data, "inst/extdata/country_data.rds")

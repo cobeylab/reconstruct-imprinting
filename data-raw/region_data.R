@@ -36,4 +36,4 @@ region_data <- lapply(regions, function(region) {
 
 names(region_data) <- regions
 
-saveRDS(region_data, "data/region_data.rds")
+saveRDS(region_data, "inst/extdata/region_data.rds")
