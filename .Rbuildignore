@@ -1,4 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
-^.lintr
+.lintr
+Readme.md
+Rplots.pdf
+shiny_app.R
