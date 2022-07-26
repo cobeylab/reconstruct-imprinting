@@ -1,4 +1,4 @@
-INTENSITY_DATA <- readRDS("data/INTENSITY_DATA.rds")
+INTENSITY_DATA <- readRDS("inst/extdata/INTENSITY_DATA.rds")
 
 
 
