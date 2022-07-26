@@ -139,7 +139,7 @@ get_imprinting_probabilities <- function(observation_years,
   ## For each country, get imprinting probabilities
   for (this_country in countries) {
     who_region <- get_WHO_region(this_country)
-    this_epi_data <- get_country_cocirculation_data(this_country, max_year)
+    this_epi_data <- get_country_cocirculation_data(this_country, max_year, output_format = "matrix")
     this_intensity_data <- get_country_intensity_data(this_country, max_year, min_specimens = 50)
     stopifnot(!any(is.na(this_intensity_data$intensity)))
 

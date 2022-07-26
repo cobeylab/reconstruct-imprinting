@@ -282,6 +282,7 @@ get_country_inputs_1997_to_present <- function(country,
 #' @param country country of interest. Run `show_available_countries()` for a list of valid inputs.
 #' @param max_year last year of interest. Results will be generated from 1918:max_year.
 #' @param min_samples if fewer than `min_samples` (default 30) are reported in the country and year of interest, the function will substitute data from the corresponding WHO region.
+#' @param output_format can be 'tibble' (the default) or 'matrix' (used mainly for convenience within other functions)
 #'
 #' @return A matrix with rows showing the calendar year, the fraction of influenza A-positive specimens of each subtype (rows `A/H1N1`, `A/H2N2`, and `A/H3N2`), and of each HA group (rows `group 1`, and `group 2`). Row `A` should always be 1, as it shows the sum of subtype-specific fractions. Row `B` is a placeholder whose values are all `NA`.
 #'
@@ -294,7 +295,8 @@ get_country_inputs_1997_to_present <- function(country,
 #' @export
 get_country_cocirculation_data <- function(country,
                                            max_year,
-                                           min_samples = 30) {
+                                           min_samples = 30,
+                                           output_format = "tibble") {
   check_max_year(max_year)
   template <- get_template_data()
   
@@ -340,12 +342,17 @@ get_country_cocirculation_data <- function(country,
   stopifnot(1918:max_year %in% full_outputs$year)
   test_rowsums_group(full_outputs$group1, group2 = full_outputs$group2)
   test_rowsums_subtype(full_outputs$`A/H1N1`, full_outputs$`A/H2N2`, full_outputs$`A/H3N2`)
+  if(output_format == "tibble"){
+    return(full_outputs)
+  }else{
+    stopifnot(output_format == "matrix")
   ## Format as a matrix whose column names are years
   output_matrix <- full_outputs %>%
     as.matrix() %>%
     t()
   colnames(output_matrix) <- output_matrix["year", ]
   return(output_matrix)
+  }
 }
 
 
