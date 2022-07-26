@@ -1,10 +1,40 @@
 INTENSITY_DATA = readRDS("data/INTENSITY_DATA.rds")
 
+
+
+#' Calculate the probability imprinting occurs n years after birth
+#' 
+#' Given an individual's birth year, the year of observation, and pre-calculated influenza circulation intensities, calculate the probability that the first influenza infection occurs exactly 0, 1, 2, ... 12 years after birth. 
+#' 
+#' @details The probability of primary influenza infection n years after birth is calculated based on a modified [geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution): let p be the average annual probability of a primary influenza infection. Then the probability that primary infection occurs n=0,1,2,... years after birth is \eqn{p*(1-p)^{n}}.
+#' 
+#' This function modifies the geometric model above to account for changes in annual circulation intensity, so that annual probabilities of primary infection \eqn{p_i} are scaled by the intensity in calendar year i. Details are given in [Gostic et al. Science, 2016](https://www.science.org/doi/10.1126/science.aag1322).
+#' 
+#' @param birth_year year of birth (numeric). Must be between 1918 and the current calendar year.
+#' @param observation_year year of observation, which affects the birth cohort's age.
+#' @param intensity_df data frame of annual intensities, output by [get_country_intensity_data()].
+#' @param max_year maximum year for which to output probabilities. Must be greater than or equal to observation_year.
+#' @param baseline_annual_p_infection average annual probability of primary infection. The default, 0.28, was estimated using age-seroprevalence data in [Gostic et al. 2016](https://www.science.org/doi/10.1126/science.aag1322).
+#' 
+#' @return a vector whose entries show the probability that a person born in year 0 was first infected by influenza in year 0, 1, 2, 3, ...  We only consider the first 13 probabilities. These outputs are not normalized, so the vector sum asymptotically approaches one, but is not exactly equal to one. For cohorts born <13 years prior to the year of observation, the output vector will have less than 13 entries.
+#' 
+#' @examples 
+#' # For a cohort >12  years old and born in 2000, return the probabilities of primary infection in 2000, 2001, ... 2012:
+#' get_p_infection_year(birth_year = 2000, 
+#'                      observation_year = 2022, 
+#'                      intensity_df = get_country_intensity_data('Canada', 2022), 
+#'                      max_year = 2022)
+#' 
+#' #' # For a cohort <12  years old, born in 2020, return the probabilities of primary infection in 2020, 2021, and 2022:
+#' get_p_infection_year(birth_year = 2020, 
+#'                      observation_year = 2022, 
+#'                      intensity_df = get_country_intensity_data('Mexico', 2022), 
+#'                      max_year = 2022)
 get_p_infection_year = function(birth_year,
                                 observation_year, ## Year of data collection, which matters if observation_year is shortly after birth_year
-                                baseline_annual_p_infection = 0.28, ## Baseline annual probability of infection
+                                intensity_df,
                                 max_year,
-                                intensity_df){ ## max calendar year for which to output estimates
+                                baseline_annual_p_infection = 0.28){ ## max calendar year for which to output estimates
   ## Function to calculate probs of first exposure in year x, given birth in year y
   ## INPUTS
   ##    - year in which an individual was born (birth.year)
@@ -53,9 +83,28 @@ to_long_df <- function(outlist){
   bind_rows(list_of_dfs, .id = 'subtype') ## Bind all subtypes into a single long data frame and return
 }
 
+
+#' Calculate imprinting probabilities
+#' 
+#' For each country and year of observation, calculate the probability that cohorts born in each year from 1918 through the year of observation imprinted to a specific influenza A virus subtype (H1N1, H2N2, or H3N2), or group (group 1 contains H1N1 and H2N2; group 2 contains H3N2).
+#' 
+#' @param observation_years year(s) of observation in which to output imprinting probabilities. The observation year, together with the birth year, determines the birth cohort's age when calculating imprinting probabilities. Cohorts <=12 years old at the time of observation have some probability of being naive to influenza.
+#' @param countries a vector of countries for which to calculate imprinting probabilities. Run `show_available_countries()` for a list of valid inputs, and proper spellings.
+#' @param df_format must be either 'long' (default) or 'wide'. Controls whether the output data frame is in long format (with a single column for calculated probabilities and a second column for imprinting subtype), or wide format (with four columns, H1N1, H2N2, H3N2, and naive) showing the probability of each imprinting status.
+#' 
+#' @details Imprinting probabilities are calculated following [Gostic et al. 2016](https://www.science.org/doi/10.1126/science.aag1322). Briefly, the model first calculates the probability that an individual's first influenza infection occurs 0, 1, 2, ... 12 years after birth using a modified geometric waiting time model. The annual circulation intensities output by [get_country_intensity_data()] scale the probability of primary infection in each calendar year.
+#' 
+#' Then, after calculating the probability of imprinting 0, 1, 2, ... calendar years after birth, the model uses data on which subtypes circulated in each calendar year (from [get_country_cocirculation_data()]) to estimate that probability that a first infection was caused by each subtype. See [get_country_cocirculation_data()] for details about the underlying data sources.
+#' 
+#' @return 
+#' * If `format=long` (the default), a long tibble with columns showing the imprinting subtype (H1N1, H2N2, H3N2, or naive), the year of observation, the country, the birth year, and the imprinting probability.
+#' * If `format=wide`, a wide tibble with each row representing a country, observation year, and birth year, and with a column for each influenza A subtype (H1N1, H2N2, and H3N2), or the probability that someone born in that year remains naive to influenza and has not yet imprinted.
+#' For cohorts >12 years old in the year of observation, the probability of remaining naive is 0, and the subtype-specific probabilities are normalized to sum to 1. For cohorts <=12 years old in the year of observation, the probability of remaining naive is non-zero. For cohorts not yet born at the time of observation, all output probabilities are 0.
+#' 
 #' @export
-get_imprinting_probabilities <- function(observation_years,  ## Year of data collection, which matters if observation_year is shortly after birth_year
-                                         countries ## vector of one or more country names. See available_countries() for help.
+get_imprinting_probabilities <- function(observation_years, 
+                                         countries, 
+                                         df_format = 'long'
 ){
   ## INPUT - a vector of countries, a vector of observation years
   ## OUTPUT - a list of matrices containing subtype-specific imprinting probabilities for each country-year of observation, and each birth year
@@ -161,7 +210,13 @@ get_imprinting_probabilities <- function(observation_years,  ## Year of data col
               H3N2_probs=H3N2_probs, 
               naive_probs=naive_probs)
   
-  return(to_long_df(outlist))
+  if(df_format=="wide"){
+    return(to_long_df(outlist) %>%
+             pivot_wider(id_cols = c(year, country, birth_year), names_from = subtype, values_from = imprinting_prob))
+  }else{
+    stopifnot(df_format=="long")
+    return(to_long_df(outlist))
+  }
 }
   
 
