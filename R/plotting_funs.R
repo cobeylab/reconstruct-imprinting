@@ -1,5 +1,16 @@
 ## Functions to plot the outputs of `get_imprinting_probabilities`
 
+#' Plot imprinting probabilities for a single country and year
+#'
+#' Generate a stacked barplot, where each bar represents a birth cohort, and the colors within the bar show the probabilities that someone born in that cohort has a particular imprinting status.
+#'
+#' @param imprinting_df A long data frame of imprinted probabilities output by [get_imprinting_probabilities()]. If the data frame contains more than one country and year, on the first will be plotted.
+#'
+#' @examples
+#' plot_one_country_year(imprinting_df = get_imprinting_probabilities(observation_years = 2022, countries = "Aruba"))
+#'
+#' imprinting_df <- get_imprinting_probabilities(observation_years = 1997, countries = c("Algeria", "South Africa"))
+#' plot_one_country_year(imprinting_df)
 #' @export
 plot_one_country_year <- function(imprinting_df) {
   ## This function plots imprinting patterns for a single country-year
@@ -28,10 +39,21 @@ plot_one_country_year <- function(imprinting_df) {
 }
 
 
+#' Plot imprinting probabilities for up to five country-years
+#'
+#' For each country and year, generate two plots:
+#' * A stacked barplot, where each bar represents a birth cohort, and the colors within the bar show the probabilities that someone born in that cohort has a particular imprinting status, for the first observation year.
+#' * A lineplot showing the age-specific probability of imprinting to H3N2 in the first and last observation year. When the data contain more than one observation year, this plot shows how cohorts age over time.
+#'
+#' @param imprinting_df A long data frame of imprinted probabilities output by [get_imprinting_probabilities()]. Up to five countries and an arbitrary span of years can be plotted.
+#'
+#' @examples
+#' plot_many_country_years(imprinting_df = get_imprinting_probabilities(observation_years = 2010:2022, countries = c("Spain", "Vietnam", "France")))
+#'
+#' imprinting_df <- get_imprinting_probabilities(observation_years = 1997:2000, countries = c("Oman", "Indonesia"))
+#' plot_many_country_years(imprinting_df)
 #' @export
 plot_many_country_years <- function(imprinting_df) {
-  ## This function plots imprinting patterns for a single country-year
-  ## If the data frame contains more than one country-year, it plots the first listed
   countries <- unique(imprinting_df$country)
   if (length(countries) > 5) {
     warning("Plotting only the first 5 countires.")

@@ -28,10 +28,10 @@ region_data <- lapply(regions, function(region) {
         n_BVic = sum(BVICTORIA, na.rm = T),
         n_B = n_BYam + n_BVic,
         n_processed = sum(SPEC_PROCESSED_NB, na.rm = T)
-      ) %>%
-      ungroup()
+      ) %>% ungroup()
   }) %>%
     bind_rows() ## Combine into a single data frame
+  # check_years(region_data$Year, max_year)
 })
 
 names(region_data) <- regions
