@@ -1,4 +1,4 @@
 library(testthat)
-library(reconstructimprinting)
+library(imprinting)
 
-test_check("reconstructimprinting")
+test_check("imprinting")
