@@ -82,3 +82,12 @@ test_that("Countries with low-quality intensity data return appropriate intensit
   expect_true(all(intensities_Germany$intensity >= -2.5 & intensities_Germany$intensity <= 2.5))
   expect_true(all(intensities_Iraq$intensity >= -2.5 & intensities_Iraq$intensity <= 2.5))
 })
+
+
+test_that("Cocirculation returns the type from the output format parameter.", {
+  cocirc_matrix <- get_country_cocirculation_data("United States", "2019", output_format = "matrix")
+  cocirc_tibble <- get_country_cocirculation_data("United States", "2019", output_format = "tibble")
+
+  expect_true(all(class(cocirc_matrix) == c("matrix", "array")))
+  expect_true(all(class(cocirc_tibble) == c("tbl_df", "tbl", "data.frame")))
+})
