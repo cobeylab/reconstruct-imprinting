@@ -297,6 +297,8 @@ get_country_cocirculation_data <- function(country,
                                            min_samples = 30) {
   check_max_year(max_year)
   template <- get_template_data()
+  
+  if(max_year >= 1996){
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
   country_data <- get_country_inputs_1997_to_present(country, max_year) %>%
     dplyr::filter(n_A >= min_samples) %>%
@@ -330,7 +332,12 @@ get_country_cocirculation_data <- function(country,
     template,
     formatted_data
   )
-  check_years(years = full_outputs$year, max_year = max_year)
+  }else{
+    full_outputs <- template %>%
+      dplyr::filter(year <= max_year)
+  }
+  
+  stopifnot(1918:max_year %in% full_outputs$year)
   test_rowsums_group(full_outputs$group1, group2 = full_outputs$group2)
   test_rowsums_subtype(full_outputs$`A/H1N1`, full_outputs$`A/H2N2`, full_outputs$`A/H3N2`)
   ## Format as a matrix whose column names are years
@@ -365,6 +372,8 @@ get_country_intensity_data <- function(country,
   check_max_year(max_year)
   pre_1997_intensity <- INTENSITY_DATA %>% dplyr::filter(year <= 1997)
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
+  
+  if(max_year > 1996){
   country_data <- get_country_inputs_1997_to_present(country, max_year) %>%
     dplyr::filter(n_processed >= min_specimens) %>% ## Exclude country-years that don't meet the minimum sample size
     mutate(quality_check = n_processed >= (n_A + n_B)) %>%
@@ -405,8 +414,11 @@ get_country_intensity_data <- function(country,
     pre_1997_intensity,
     formatted_data
   )
-  # ggplot(full_outputs) + geom_point(aes(x = year, y = intensity))
-  check_years(years = full_outputs$year, max_year = max_year)
+  }else{
+    full_outputs = pre_1997_intensity %>%
+      dplyr::filter(year <= max_year)
+  }
+  stopifnot(1918:max_year %in% full_outputs$year)
   ## Format as a matrix whose column names are years
   return(full_outputs)
 }
