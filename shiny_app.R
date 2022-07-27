@@ -1,5 +1,5 @@
 library(shiny)
-library(reconstructimprinting)
+library(imprinting)
 
 ui <- fluidPage(
   headerPanel("Imprinting Probabilities"),
