@@ -299,59 +299,59 @@ get_country_cocirculation_data <- function(country,
                                            output_format = "tibble") {
   check_max_year(max_year)
   template <- get_template_data()
-  
-  if(max_year >= 1996){
-  ## Get country data, and only keep years in which there are enough samples to meet the threshold
-  country_data <- get_country_inputs_1997_to_present(country, max_year) %>%
-    dplyr::filter(n_A >= min_samples) %>%
-    mutate(data_from = paste0("country: ", country))
-  ## Get regional data for years that don't meet the threshold
-  region_data <- get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
-    dplyr::filter(!(Year %in% country_data$Year))
 
-  ## Calculate the proportions of each subtype from counts,
-  ## And reformat to match the template columns
-  formatted_data <- bind_rows(
-    region_data,
-    country_data
-  ) %>%
-    mutate(
-      `A/H1N1` = n_H1N1 / n_A,
-      `A/H2N2` = 0,
-      `A/H3N2` = n_H3N2 / n_A,
-      B = NA
-    ) %>%
-    mutate(
-      group1 = `A/H1N1` + `A/H2N2`,
-      group2 = `A/H3N2`,
-      A = `A/H1N1` + `A/H2N2` + `A/H3N2`
-    ) %>%
-    rename(year = Year) %>%
-    select(year, starts_with("A"), starts_with("B"), starts_with("group"), data_from)
+  if (max_year >= 1996) {
+    ## Get country data, and only keep years in which there are enough samples to meet the threshold
+    country_data <- get_country_inputs_1997_to_present(country, max_year) %>%
+      dplyr::filter(n_A >= min_samples) %>%
+      mutate(data_from = paste0("country: ", country))
+    ## Get regional data for years that don't meet the threshold
+    region_data <- get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
+      dplyr::filter(!(Year %in% country_data$Year))
 
-  ## Combine with the template data for pre-1977 years
-  full_outputs <- bind_rows(
-    template,
-    formatted_data
-  )
-  }else{
+    ## Calculate the proportions of each subtype from counts,
+    ## And reformat to match the template columns
+    formatted_data <- bind_rows(
+      region_data,
+      country_data
+    ) %>%
+      mutate(
+        `A/H1N1` = n_H1N1 / n_A,
+        `A/H2N2` = 0,
+        `A/H3N2` = n_H3N2 / n_A,
+        B = NA
+      ) %>%
+      mutate(
+        group1 = `A/H1N1` + `A/H2N2`,
+        group2 = `A/H3N2`,
+        A = `A/H1N1` + `A/H2N2` + `A/H3N2`
+      ) %>%
+      rename(year = Year) %>%
+      select(year, starts_with("A"), starts_with("B"), starts_with("group"), data_from)
+
+    ## Combine with the template data for pre-1977 years
+    full_outputs <- bind_rows(
+      template,
+      formatted_data
+    )
+  } else {
     full_outputs <- template %>%
       dplyr::filter(year <= max_year)
   }
-  
+
   stopifnot(1918:max_year %in% full_outputs$year)
   test_rowsums_group(full_outputs$group1, group2 = full_outputs$group2)
   test_rowsums_subtype(full_outputs$`A/H1N1`, full_outputs$`A/H2N2`, full_outputs$`A/H3N2`)
-  if(output_format == "tibble"){
+  if (output_format == "tibble") {
     return(full_outputs)
-  }else{
+  } else {
     stopifnot(output_format == "matrix")
-  ## Format as a matrix whose column names are years
-  output_matrix <- full_outputs %>%
-    as.matrix() %>%
-    t()
-  colnames(output_matrix) <- output_matrix["year", ]
-  return(output_matrix)
+    ## Format as a matrix whose column names are years
+    output_matrix <- full_outputs %>%
+      as.matrix() %>%
+      t()
+    colnames(output_matrix) <- output_matrix["year", ]
+    return(output_matrix)
   }
 }
 
@@ -379,50 +379,50 @@ get_country_intensity_data <- function(country,
   check_max_year(max_year)
   pre_1997_intensity <- INTENSITY_DATA %>% dplyr::filter(year <= 1997)
   ## Get country data, and only keep years in which there are enough samples to meet the threshold
-  
-  if(max_year > 1996){
-  country_data <- get_country_inputs_1997_to_present(country, max_year) %>%
-    dplyr::filter(n_processed >= min_specimens) %>% ## Exclude country-years that don't meet the minimum sample size
-    mutate(quality_check = n_processed >= (n_A + n_B)) %>%
-    dplyr::filter(quality_check == TRUE) %>% ## Exclude county-years that don't meet the quality check
-    mutate(data_from = paste0("country: ", country)) %>%
-    mutate(
-      raw_intensity = n_A / n_processed,
-      intensity = ifelse(quality_check == FALSE, 1, raw_intensity / mean(raw_intensity[quality_check == TRUE])), ## Define intensity relative to the mean
-      intensity = pmin(intensity, 2.5)
-    )
 
-  ## Get regional data for years that don't meet the quality check and sample size requirements
-  region_data <- get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
-    dplyr::filter(!(Year %in% country_data$Year)) %>%
-    mutate(
-      data_from = paste0("region: ", get_WHO_region(country)),
-      quality_check = n_processed >= (n_A + n_B)
+  if (max_year > 1996) {
+    country_data <- get_country_inputs_1997_to_present(country, max_year) %>%
+      dplyr::filter(n_processed >= min_specimens) %>% ## Exclude country-years that don't meet the minimum sample size
+      mutate(quality_check = n_processed >= (n_A + n_B)) %>%
+      dplyr::filter(quality_check == TRUE) %>% ## Exclude county-years that don't meet the quality check
+      mutate(data_from = paste0("country: ", country)) %>%
+      mutate(
+        raw_intensity = n_A / n_processed,
+        intensity = ifelse(quality_check == FALSE, 1, raw_intensity / mean(raw_intensity[quality_check == TRUE])), ## Define intensity relative to the mean
+        intensity = pmin(intensity, 2.5)
+      )
+
+    ## Get regional data for years that don't meet the quality check and sample size requirements
+    region_data <- get_regional_inputs_1997_to_present(get_WHO_region(country), max_year) %>%
+      dplyr::filter(!(Year %in% country_data$Year)) %>%
+      mutate(
+        data_from = paste0("region: ", get_WHO_region(country)),
+        quality_check = n_processed >= (n_A + n_B)
+      ) %>%
+      mutate(
+        raw_intensity = n_A / n_processed,
+        intensity = ifelse(quality_check == FALSE, 1, raw_intensity / mean(raw_intensity[quality_check == TRUE])), ## Define intensity relative to the mean
+        intensity = pmin(intensity, 2.5)
+      )
+
+    ## Calculate the proportions of each subtype from counts,
+    ## And reformat to match the template columns
+    formatted_data <- bind_rows(
+      region_data,
+      country_data
     ) %>%
-    mutate(
-      raw_intensity = n_A / n_processed,
-      intensity = ifelse(quality_check == FALSE, 1, raw_intensity / mean(raw_intensity[quality_check == TRUE])), ## Define intensity relative to the mean
-      intensity = pmin(intensity, 2.5)
+      rename(year = Year) %>%
+      arrange(year) %>%
+      select(year, intensity)
+
+
+    ## Combine with the template data for pre-1977 years
+    full_outputs <- bind_rows(
+      pre_1997_intensity,
+      formatted_data
     )
-
-  ## Calculate the proportions of each subtype from counts,
-  ## And reformat to match the template columns
-  formatted_data <- bind_rows(
-    region_data,
-    country_data
-  ) %>%
-    rename(year = Year) %>%
-    arrange(year) %>%
-    select(year, intensity)
-
-
-  ## Combine with the template data for pre-1977 years
-  full_outputs <- bind_rows(
-    pre_1997_intensity,
-    formatted_data
-  )
-  }else{
-    full_outputs = pre_1997_intensity %>%
+  } else {
+    full_outputs <- pre_1997_intensity %>%
       dplyr::filter(year <= max_year)
   }
   stopifnot(1918:max_year %in% full_outputs$year)
