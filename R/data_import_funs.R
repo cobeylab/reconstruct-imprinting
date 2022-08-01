@@ -1,7 +1,7 @@
 # Read data from CSVs into COUNTRY_NAMES, THOMPSON_DATA, and REGION_DATA
-COUNTRY_NAMES <- readRDS("inst/extdata/COUNTRY_NAMES.rds")
-THOMPSON_DATA <- readRDS("inst/extdata/THOMPSON_DATA.rds")
-INTENSITY_DATA <- readRDS("inst/extdata/INTENSITY_DATA.rds")
+COUNTRY_NAMES <- readRDS(system.file("extdata", "COUNTRY_NAMES.rds", package="imprinting"))
+THOMPSON_DATA <- readRDS(system.file("extdata", "THOMPSON_DATA.rds", package="imprinting"))
+INTENSITY_DATA <- readRDS(system.file("extdata", "INTENSITY_DATA.rds", package="imprinting"))
 
 parse_region_names <- function(region) {
   ## Convert two-word region names for file import
@@ -209,14 +209,14 @@ get_template_data <- function() {
 get_regional_inputs_1997_to_present <- function(region,
                                                 max_year) {
   check_max_year(max_year)
-  valid_regions <- readRDS("inst/extdata/valid_regions.rds")
+  valid_regions <- readRDS(system.file("extdata", "valid_regions.rds", package="imprinting"))
   ## Throw an error and a help message if region doesn't exist
   if (!region %in% valid_regions) {
     stop(sprintf("%s is not valid. \n Run show_available_regions() for a list of valid region inputs.\n Run get_WHO_region('%s') to look up %s's WHO region", region, region, region))
   }
 
   ## Load data from valid files
-  region_data <- readRDS("inst/extdata/region_data.rds")
+  region_data <- readRDS(system.file("extdata", "region_data.rds", package="imprinting"))
   current_region_data <- region_data[[region]]
   check_years(current_region_data$Year, max_year)
   return(current_region_data %>% arrange(Year))
@@ -247,7 +247,7 @@ get_country_inputs_1997_to_present <- function(country,
   check_max_year(max_year)
   who_region <- get_WHO_region(country)
   ## Throw an error and a help message if region doesn't exist
-  valid_regions <- readRDS("inst/extdata/valid_regions.rds")
+  valid_regions <- readRDS(system.file("extdata", "valid_regions.rds", package="imprinting"))
   if (!who_region %in% valid_regions) {
     stop(sprintf('No files found for region: "%s" \nValid regions are: %s\nSee https://en.wikipedia.org/wiki/List_of_WHO_regions for a list of WHO regions.\nNew data files can be obtained at WHO FluMart - https://apps.who.int/flumart/Default?ReportNo=12', who_region, paste(valid_regions, sep = ", ")))
   }
@@ -255,7 +255,7 @@ get_country_inputs_1997_to_present <- function(country,
     warning("Country-specific data are not available prior to 1996. Returning a NULL result.")
     return(NULL)
   }
-  country_data <- readRDS("inst/extdata/country_data.rds")
+  country_data <- readRDS(system.file("extdata", "country_data.rds", package="imprinting"))
   current_country_data <- country_data[[country]] %>%
     dplyr::filter(Year <= max_year)
 
