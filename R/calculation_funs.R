@@ -1,4 +1,4 @@
-INTENSITY_DATA <- readRDS(system.file("extdata", "INTENSITY_DATA.rds", package="imprinting"))
+INTENSITY_DATA <- readRDS(system.file("extdata", "INTENSITY_DATA.rds", package = "imprinting"))
 
 #' Calculate the probability imprinting occurs n years after birth
 #'
