@@ -1,4 +1,4 @@
-COUNTRY_NAMES <- readRDS("inst/extdata/COUNTRY_NAMES.rds")
-THOMPSON_DATA <- readRDS("inst/extdata/THOMPSON_DATA.rds")
-INTENSITY_DATA <- readRDS("inst/extdata/INTENSITY_DATA.rds")
-valid_regions <- readRDS("inst/extdata/valid_regions.rds")
+COUNTRY_NAMES <- readRDS(system.file("extdata", "COUNTRY_NAMES.rds", package = "imprinting"))
+THOMPSON_DATA <- readRDS(system.file("extdata", "THOMPSON_DATA.rds", package = "imprinting"))
+INTENSITY_DATA <- readRDS(system.file("extdata", "INTENSITY_DATA.rds", package = "imprinting"))
+valid_regions <- readRDS(system.file("extdata", "valid_regions.rds", package = "imprinting"))
